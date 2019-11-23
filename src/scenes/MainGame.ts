@@ -60,7 +60,7 @@ export default class MainGame extends Scene {
         this.camera = new Camera();
         this.camera.type = 'perspective';
         this.camera.position = vec3.fromValues(0,2,-2);
-        this.camera.direction = vec3.fromValues(0,-0.5,1);
+        this.camera.direction = vec3.fromValues(0,-1,1);
         this.camera.aspectRatio = this.gl.drawingBufferWidth/this.gl.drawingBufferHeight;
         
         /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
@@ -77,6 +77,7 @@ export default class MainGame extends Scene {
     public draw(deltaTime: number): void {
         let VP = this.camera.ViewProjectionMatrix; // Universal View-Projection Matrix (Constant Through The Whole Game)
         this.time += deltaTime / 1000;             // Time in seconds we use delta time to be consitant on all computers 
+        this.roadTimer += deltaTime /1000;         // Road time to check after n time
 
         this.controller.update(deltaTime); //Only For testing purposes (will be removed)
 
@@ -89,6 +90,7 @@ export default class MainGame extends Scene {
         //To Do draw infinite plane with time
         this.DrawRoad(VP); 
 
+        console.log(this.CheckRoadTimePassed(2));
     }
     
     public end(): void {
@@ -100,7 +102,7 @@ export default class MainGame extends Scene {
 
     public DrawRoad(VP : mat4) : mat4
     {
-        // Here we draw 2 planes as a start
+        // Here we draw 3 planes as a start
 
         // Start of first plane
         let roadMat = mat4.clone(VP);
@@ -128,9 +130,48 @@ export default class MainGame extends Scene {
 
         this.meshes['road'].draw(this.gl.TRIANGLES);
 
-        //ToDo draw after n time
+        // Start of third plane
+        mat4.translate(roadMat , roadMat , [2,0,0]);                     // increment x by 2 (distance between 2 planes)
+
+        this.roadProgram.setUniformMatrix4fv("MVP", false, roadMat);
+        this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
+
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures['road']);
+        this.roadProgram.setUniform1i('texture_sampler', 0);
+
+        this.meshes['road'].draw(this.gl.TRIANGLES);
+
+        this.DrawRoadAfterTime(roadMat);
 
         return roadMat;
+    }
+
+    public DrawRoadAfterTime(roadMat :mat4)
+    {
+        mat4.translate(roadMat , roadMat , [2,0,0]);                     // increment x by 2 (distance between 2 planes)
+        
+        this.roadProgram.setUniformMatrix4fv("MVP", false, roadMat);
+        this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
+        
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures['road']);
+        this.roadProgram.setUniform1i('texture_sampler', 0);
+        
+        this.meshes['road'].draw(this.gl.TRIANGLES); 
+    }
+
+    public CheckRoadTimePassed(passedTime: number)
+    {
+        if(this.roadTimer > passedTime)
+        {
+            this.roadTimer = 0;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
 }
