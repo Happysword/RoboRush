@@ -7,11 +7,11 @@ import FlyCameraController from '../common/camera-controllers/fly-camera-control
 import { vec3, mat4 } from 'gl-matrix';
 import { Vector, Selector } from '../common/dom-utils';
 import { createElement, StatelessProps, StatelessComponent } from 'tsx-create-element';
+import Road from '../common/road';
 
 export default class MainGame extends Scene {
     
     time: number = 0;
-    roadTimer : number = 0;
     roadProgram: ShaderProgram;
     meshes: {[name: string]: Mesh} = {};
     textures: {[name: string]: WebGLTexture} = {};
@@ -19,6 +19,7 @@ export default class MainGame extends Scene {
     controller: FlyCameraController;
 
     roadMat : mat4;
+    road : Road;
 
     public load(): void {
         this.game.loader.load({
@@ -75,22 +76,18 @@ export default class MainGame extends Scene {
     }
     
     public draw(deltaTime: number): void {
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+
         let VP = this.camera.ViewProjectionMatrix; // Universal View-Projection Matrix (Constant Through The Whole Game)
         this.time += deltaTime / 1000;             // Time in seconds we use delta time to be consitant on all computers 
-        this.roadTimer += deltaTime /1000;         // Road time to check after n time
 
-        this.controller.update(deltaTime); //Only For testing purposes (will be removed)
-
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        this.controller.update(deltaTime); //Only For testing purposes (will be removed) , it update control camera with mouse
         
-        this.roadProgram.use();
-
-        let M = mat4.identity(mat4.create());
+        this.road = new Road(VP , this.roadProgram ,  this.textures['road'] ,this.meshes['road'] , this.gl , deltaTime );
         
-        //To Do draw infinite plane with time
-        this.DrawRoad(VP); 
-
-        console.log(this.CheckRoadTimePassed(2));
+        // To-Do draw infinite plane with time in road Class
+        this.road.drawRoad();
+        
     }
     
     public end(): void {
@@ -98,80 +95,6 @@ export default class MainGame extends Scene {
         this.roadProgram = null;
         this.meshes['road'].dispose();
         this.meshes['road'] = null;
-    }
-
-    public DrawRoad(VP : mat4) : mat4
-    {
-        // Here we draw 3 planes as a start
-
-        // Start of first plane
-        let roadMat = mat4.clone(VP);
-        mat4.rotateY(roadMat,roadMat, -90 * Math.PI / 180)
-        mat4.scale(roadMat, roadMat, [3, 1, 3]);
-
-        this.roadProgram.setUniformMatrix4fv("MVP", false, roadMat);
-        this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
-
-        this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures['road']);
-        this.roadProgram.setUniform1i('texture_sampler', 0);
-
-        this.meshes['road'].draw(this.gl.TRIANGLES);
-
-        // Start of second plane
-        mat4.translate(roadMat , roadMat , [2,0,0]);                     // increment x by 2 (distance between 2 planes)
-
-        this.roadProgram.setUniformMatrix4fv("MVP", false, roadMat);
-        this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
-
-        this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures['road']);
-        this.roadProgram.setUniform1i('texture_sampler', 0);
-
-        this.meshes['road'].draw(this.gl.TRIANGLES);
-
-        // Start of third plane
-        mat4.translate(roadMat , roadMat , [2,0,0]);                     // increment x by 2 (distance between 2 planes)
-
-        this.roadProgram.setUniformMatrix4fv("MVP", false, roadMat);
-        this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
-
-        this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures['road']);
-        this.roadProgram.setUniform1i('texture_sampler', 0);
-
-        this.meshes['road'].draw(this.gl.TRIANGLES);
-
-        this.DrawRoadAfterTime(roadMat);
-
-        return roadMat;
-    }
-
-    public DrawRoadAfterTime(roadMat :mat4)
-    {
-        mat4.translate(roadMat , roadMat , [2,0,0]);                     // increment x by 2 (distance between 2 planes)
-        
-        this.roadProgram.setUniformMatrix4fv("MVP", false, roadMat);
-        this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
-        
-        this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures['road']);
-        this.roadProgram.setUniform1i('texture_sampler', 0);
-        
-        this.meshes['road'].draw(this.gl.TRIANGLES); 
-    }
-
-    public CheckRoadTimePassed(passedTime: number)
-    {
-        if(this.roadTimer > passedTime)
-        {
-            this.roadTimer = 0;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
     }
 
 }
