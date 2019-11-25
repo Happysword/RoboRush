@@ -9,17 +9,19 @@ import { Vector, Selector } from '../common/dom-utils';
 import { createElement, StatelessProps, StatelessComponent } from 'tsx-create-element';
 import Road from '../common/road';
 import Input from '../common/input';
+import Player from '../common/Player';
 
 export default class MainGame extends Scene {
     
     roadProgram: ShaderProgram;
-
+    playerprogram: ShaderProgram;
     time: number = 0;
     meshes: {[name: string]: Mesh} = {};
     textures: {[name: string]: WebGLTexture} = {};
     camera: Camera;
     controller: FlyCameraController;
-
+    player :Player
+    playerMat: mat4
     roadMat : mat4;
     road : Road;
 
@@ -41,6 +43,11 @@ export default class MainGame extends Scene {
         this.roadProgram.attach(this.game.loader.resources["Road.vert"], this.gl.VERTEX_SHADER);
         this.roadProgram.attach(this.game.loader.resources["Road.frag"], this.gl.FRAGMENT_SHADER);
         this.roadProgram.link();
+
+        this.playerprogram = new ShaderProgram(this.gl);
+        this.playerprogram.attach(this.game.loader.resources["RedColor.vert"], this.gl.VERTEX_SHADER);
+        this.playerprogram.attach(this.game.loader.resources["RedColor.frag"], this.gl.FRAGMENT_SHADER);
+        this.playerprogram.link();
 
         /*******************************  Initializing all the models *******************************/
 
@@ -99,6 +106,10 @@ export default class MainGame extends Scene {
         this.road.drawRoad(100);      // Draws Infinite Plane With X planes to be repeated
         
         this.camera.Move(600 , 0.3 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
+
+        this.player = new Player( VP,this.camera.getposition(), this.playerprogram,this.meshes['player'],this.gl,deltaTime); 
+
+        this.player.Draw();
     }
     
     public end(): void {

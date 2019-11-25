@@ -48,4 +48,9 @@ export default class Camera {
             camera.position = vec3.fromValues(0,2.5,-2);
         }
     }
+
+    public getposition() : vec3
+    {
+        return this.position;
+    }
 }
