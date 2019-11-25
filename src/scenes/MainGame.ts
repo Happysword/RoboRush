@@ -98,7 +98,7 @@ export default class MainGame extends Scene {
         
         this.road.drawRoad(100);      // Draws Infinite Plane With X planes to be repeated
         
-        this.camera.Move(25 , 0.3 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
+        this.camera.Move(600 , 0.3 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
     }
     
     public end(): void {
