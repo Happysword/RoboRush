@@ -38,4 +38,14 @@ export default class Camera {
         const up = vec3.normalize(vec3.create(), this.up);
         return vec3.cross(up, this.direction, up);
     }
+
+    public Move(maxDistance : number, speed : number , camera : Camera)
+    {
+        vec3.add(camera.position ,camera.position, [ 0, 0 , speed]);
+
+        if(vec3.distance([0,0,0] , camera.position) > maxDistance )
+        {
+            camera.position = vec3.fromValues(0,2.5,-2);
+        }
+    }
 }

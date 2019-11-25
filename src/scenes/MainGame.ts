@@ -8,11 +8,13 @@ import { vec3, mat4 } from 'gl-matrix';
 import { Vector, Selector } from '../common/dom-utils';
 import { createElement, StatelessProps, StatelessComponent } from 'tsx-create-element';
 import Road from '../common/road';
+import Input from '../common/input';
 
 export default class MainGame extends Scene {
     
-    time: number = 0;
     roadProgram: ShaderProgram;
+
+    time: number = 0;
     meshes: {[name: string]: Mesh} = {};
     textures: {[name: string]: WebGLTexture} = {};
     camera: Camera;
@@ -43,6 +45,7 @@ export default class MainGame extends Scene {
         /*******************************  Initializing all the models *******************************/
 
         this.meshes['road'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoadPlane"]);
+        this.meshes['player'] = MeshUtils.Sphere(this.gl);
 
         /*******************************  Initializing all the textures *******************************/
 
@@ -60,8 +63,8 @@ export default class MainGame extends Scene {
 
         this.camera = new Camera();
         this.camera.type = 'perspective';
-        this.camera.position = vec3.fromValues(0,2,-2);
-        this.camera.direction = vec3.fromValues(0,-1,1);
+        this.camera.position = vec3.fromValues(0,2.5,-2);
+        this.camera.direction = vec3.fromValues(0,-0.75,0.63);
         this.camera.aspectRatio = this.gl.drawingBufferWidth/this.gl.drawingBufferHeight;
         
         /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
@@ -72,6 +75,14 @@ export default class MainGame extends Scene {
         /*******************************  Clearing Screen With Color *******************************/
 
         this.gl.clearColor(0.1,0.1,0.1,1);
+
+        /*******************************  Enabling Depth and Back-Face Culling *******************************/
+
+        this.gl.enable(this.gl.CULL_FACE);
+        this.gl.cullFace(this.gl.BACK);
+        this.gl.frontFace(this.gl.CCW);
+        this.gl.enable(this.gl.DEPTH_TEST);
+        this.gl.depthFunc(this.gl.LEQUAL);
 
     }
     
@@ -85,9 +96,9 @@ export default class MainGame extends Scene {
         
         this.road = new Road(VP , this.roadProgram ,  this.textures['road'] ,this.meshes['road'] , this.gl , deltaTime );
         
-        // To-Do draw infinite plane with time in road Class
-        this.road.drawRoad();
+        this.road.drawRoad(100);      // Draws Infinite Plane With X planes to be repeated
         
+        this.camera.Move(25 , 0.3 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
     }
     
     public end(): void {
@@ -96,5 +107,5 @@ export default class MainGame extends Scene {
         this.meshes['road'].dispose();
         this.meshes['road'] = null;
     }
-
+    
 }
