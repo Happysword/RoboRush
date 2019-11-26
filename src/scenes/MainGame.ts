@@ -73,6 +73,9 @@ export default class MainGame extends Scene {
         this.camera.position = vec3.fromValues(0,2.5,-2);
         this.camera.direction = vec3.fromValues(0,-0.75,0.63);
         this.camera.aspectRatio = this.gl.drawingBufferWidth/this.gl.drawingBufferHeight;
+
+        /*******************************Initializing the player**********************************/
+        this.player = new Player( this.playerprogram,this.meshes['player'],this.gl,this.game.input); 
         
         /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
 
@@ -107,9 +110,7 @@ export default class MainGame extends Scene {
         
         this.camera.Move(600 , 0.3 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
 
-        this.player = new Player( VP,this.camera.getposition(), this.playerprogram,this.meshes['player'],this.gl,deltaTime); 
-
-        this.player.Draw();
+        this.player.Draw(VP,this.camera.getposition(), deltaTime);
     }
     
     public end(): void {
