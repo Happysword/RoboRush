@@ -93,7 +93,7 @@ export default class MainGame extends Scene {
         // Just loading any positions for coins now but later should be loaded from file ?
         // for now just put coins everywhere
         
-        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['coin'], this.camera.getposition());
+        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['coin']);
         
         /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
 

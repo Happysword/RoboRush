@@ -1,4 +1,4 @@
-import { vec3, mat4 } from 'gl-matrix';
+import { mat4 } from 'gl-matrix';
 
 //This is the abstract base of all objects that collide with player
 export default abstract class Collider {
