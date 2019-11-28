@@ -4,17 +4,19 @@ import Mesh from '../common/mesh';
 import * as MeshUtils from '../common/mesh-utils';
 import Camera from '../common/camera';
 import FlyCameraController from '../common/camera-controllers/fly-camera-controller';
-import { vec3, mat4 } from 'gl-matrix';
+import { vec2, vec3, mat4 } from 'gl-matrix';
 import { Vector, Selector } from '../common/dom-utils';
 import { createElement, StatelessProps, StatelessComponent } from 'tsx-create-element';
 import Road from '../common/road';
 import Input from '../common/input';
 import Player from '../common/Player';
+import Coins from '../common/Coins';
 
 export default class MainGame extends Scene {
     
     roadProgram: ShaderProgram;
     playerprogram: ShaderProgram;
+    coinsprogram: ShaderProgram;
     time: number = 0;
     meshes: {[name: string]: Mesh} = {};
     textures: {[name: string]: WebGLTexture} = {};
@@ -24,11 +26,15 @@ export default class MainGame extends Scene {
     playerMat: mat4
     roadMat : mat4;
     road : Road;
+    coins : Coins;              // first parameter is lane [0=>left, 1=>middle, 2=>right] // for consistency with player
+    coinsPositions : Int16Array;    // Second paramter is distance from start of plane      
 
     public load(): void {
         this.game.loader.load({
             ["RedColor.vert"]:{url:'shaders/RedColor.vert', type:'text'},
             ["RedColor.frag"]:{url:'shaders/RedColor.frag', type:'text'},
+            ["BlueColor.vert"]:{url:'shaders/BlueColor.vert', type:'text'},
+            ["BlueColor.frag"]:{url:'shaders/BlueColor.frag', type:'text'},
             ["Road.vert"]:{url:'shaders/Road.vert', type:'text'},
             ["Road.frag"]:{url:'shaders/Road.frag', type:'text'},
             ["RoadPlane"]:{url:'models/RoadPlane.obj', type:'text'},
@@ -49,10 +55,16 @@ export default class MainGame extends Scene {
         this.playerprogram.attach(this.game.loader.resources["RedColor.frag"], this.gl.FRAGMENT_SHADER);
         this.playerprogram.link();
 
+        this.coinsprogram = new ShaderProgram(this.gl);
+        this.coinsprogram.attach(this.game.loader.resources["BlueColor.vert"], this.gl.VERTEX_SHADER);
+        this.coinsprogram.attach(this.game.loader.resources["BlueColor.frag"], this.gl.FRAGMENT_SHADER);
+        this.coinsprogram.link();
+
         /*******************************  Initializing all the models *******************************/
 
         this.meshes['road'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoadPlane"]);
         this.meshes['player'] = MeshUtils.Sphere(this.gl);
+        this.meshes['coin'] = MeshUtils.Sphere(this.gl);
 
         /*******************************  Initializing all the textures *******************************/
 
@@ -76,6 +88,12 @@ export default class MainGame extends Scene {
 
         /*******************************Initializing the player**********************************/
         this.player = new Player( this.playerprogram,this.meshes['player'],this.gl,this.game.input); 
+
+        /*******************************Initializing the Coins**********************************/
+        // Just loading any positions for coins now but later should be loaded from file ?
+        // for now just put coins everywhere
+        
+        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['coin'], this.camera.getposition());
         
         /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
 
@@ -111,6 +129,8 @@ export default class MainGame extends Scene {
         this.camera.Move(600 , 0.3 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
 
         this.player.Draw(VP,this.camera.getposition(), deltaTime);
+
+        this.coins.Draw(deltaTime, VP);
     }
     
     public end(): void {
