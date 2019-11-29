@@ -21,7 +21,7 @@ export default class Coins extends Collider {
     {
         this.coinsMat = mat4.clone(VP);
 
-        for (var i = 0; i < 2000; i += 5)
+        for (var i = 0; i < 500; i += 5)
         {
             this.drawCoin(0, i, playerPos, cameraPos);
             this.drawCoin(1, i, playerPos, cameraPos);
@@ -33,7 +33,7 @@ export default class Coins extends Collider {
     {
         if (coinLane == playerPos)
         {
-            if ((coinDistance >= (cameraPos[2] - 50)) && (coinDistance <= (cameraPos[2] + 50)))
+            if ((coinDistance >= (cameraPos[2] - 10)) && (coinDistance <= (cameraPos[2] + 10)))
             {
                 return true;
             }
@@ -44,10 +44,11 @@ export default class Coins extends Collider {
     private drawCoin(lane : number, distance : number, playerPos : number, cameraPos : vec3) : void
     {
         var coinMat = mat4.clone(this.coinsMat);
-        mat4.scale(coinMat, coinMat, [0.3, 0.3, 0.3]);
-        mat4.translate(coinMat, coinMat, [0, 1, 0]);
 
-        mat4.translate(coinMat, coinMat, [0, 0, distance]);
+        mat4.translate(coinMat, coinMat, [0, 0.5, distance]);
+
+        mat4.scale(coinMat, coinMat, [0.3, 0.3, 0.3]);
+
         if (lane == 0)
         {
             mat4.translate(coinMat, coinMat, [6, 0, 0]);
