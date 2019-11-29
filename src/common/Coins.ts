@@ -2,6 +2,7 @@ import { vec2, vec3, mat4 } from 'gl-matrix';
 import ShaderProgram from './shader-program';
 import Mesh from '../common/mesh';
 import Collider from './colliders';
+import ScoreManager from './ScoreManager';
 
 export default class Coins extends Collider {
 
@@ -12,8 +13,9 @@ export default class Coins extends Collider {
     previousHitsLane : number[];
     previousHitsDistance : number[];
     previousHitsTime : number[];
+    scoremanager : ScoreManager;
     
-    public constructor (GL : WebGL2RenderingContext, coinsprogram : ShaderProgram, coinsmesh : Mesh)
+    public constructor (GL : WebGL2RenderingContext, coinsprogram : ShaderProgram, coinsmesh : Mesh, scoresManager : ScoreManager)
     {
         super(GL);
         this.CoinsProgram = coinsprogram;
@@ -21,6 +23,7 @@ export default class Coins extends Collider {
         this.previousHitsLane = new Array<number>();
         this.previousHitsDistance = new Array<number>();
         this.previousHitsTime = new Array<number>();
+        this.scoremanager = scoresManager;
     }
 
     public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number)
@@ -29,9 +32,7 @@ export default class Coins extends Collider {
 
         for (var i = 0; i < 500; i += 5)
         {
-            this.drawCoin(0, i, playerPos, cameraPos, time);
             this.drawCoin(1, i, playerPos, cameraPos, time);
-            this.drawCoin(2, i, playerPos, cameraPos, time);
         }
     }
 
@@ -53,11 +54,12 @@ export default class Coins extends Collider {
         }
         if (coinLane == playerPos)
         {
-            if ((coinDistance >= (cameraPos[2] - 1)) && (coinDistance <= (cameraPos[2] + 4)))
+            if ((coinDistance >= (cameraPos[2])) && (coinDistance <= (cameraPos[2] + 2.5)))
             {
                 this.previousHitsLane.push(coinLane);
                 this.previousHitsDistance.push(coinDistance);
                 this.previousHitsTime.push(time);
+                this.scoremanager.ChangeScore(1);
                 return true;
             }
         }

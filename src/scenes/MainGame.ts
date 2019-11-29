@@ -11,12 +11,15 @@ import Road from '../common/road';
 import Input from '../common/input';
 import Player from '../common/Player';
 import Coins from '../common/Coins';
+import Obstacles from '../common/Obstacles';
+import ScoreManager from '../common/ScoreManager';
 
 export default class MainGame extends Scene {
     
     roadProgram: ShaderProgram;
     playerprogram: ShaderProgram;
     coinsprogram: ShaderProgram;
+    obstaclesprogram : ShaderProgram;
     time: number = 0;
     meshes: {[name: string]: Mesh} = {};
     textures: {[name: string]: WebGLTexture} = {};
@@ -26,7 +29,9 @@ export default class MainGame extends Scene {
     playerMat: mat4
     roadMat : mat4;
     road : Road;
-    coins : Coins;             
+    coins : Coins; 
+    obstacles : Obstacles;  
+    scoremanager : ScoreManager;    
 
     public load(): void {
         this.game.loader.load({
@@ -34,6 +39,8 @@ export default class MainGame extends Scene {
             ["RedColor.frag"]:{url:'shaders/RedColor.frag', type:'text'},
             ["BlueColor.vert"]:{url:'shaders/BlueColor.vert', type:'text'},
             ["BlueColor.frag"]:{url:'shaders/BlueColor.frag', type:'text'},
+            ["GreenColor.vert"]:{url:'shaders/GreenColor.vert', type:'text'},
+            ["GreenColor.frag"]:{url:'shaders/GreenColor.frag', type:'text'},
             ["Road.vert"]:{url:'shaders/Road.vert', type:'text'},
             ["Road.frag"]:{url:'shaders/Road.frag', type:'text'},
             ["RoadPlane"]:{url:'models/RoadPlane.obj', type:'text'},
@@ -59,11 +66,17 @@ export default class MainGame extends Scene {
         this.coinsprogram.attach(this.game.loader.resources["BlueColor.frag"], this.gl.FRAGMENT_SHADER);
         this.coinsprogram.link();
 
+        this.obstaclesprogram = new ShaderProgram(this.gl);
+        this.obstaclesprogram.attach(this.game.loader.resources["GreenColor.vert"], this.gl.VERTEX_SHADER);
+        this.obstaclesprogram.attach(this.game.loader.resources["GreenColor.frag"], this.gl.FRAGMENT_SHADER);
+        this.obstaclesprogram.link();
+
         /*******************************  Initializing all the models *******************************/
 
         this.meshes['road'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoadPlane"]);
         this.meshes['player'] = MeshUtils.Sphere(this.gl);
         this.meshes['coin'] = MeshUtils.Sphere(this.gl);
+        this.meshes['obstacle'] = MeshUtils.Sphere(this.gl);
 
         /*******************************  Initializing all the textures *******************************/
 
@@ -85,14 +98,16 @@ export default class MainGame extends Scene {
         this.camera.direction = vec3.fromValues(0,-0.75,0.63);
         this.camera.aspectRatio = this.gl.drawingBufferWidth/this.gl.drawingBufferHeight;
 
-        /*******************************Initializing the player**********************************/
+        /*******************************Initializing the player & score**********************************/
         this.player = new Player( this.playerprogram,this.meshes['player'],this.gl,this.game.input); 
+        this.scoremanager = new ScoreManager();
 
-        /*******************************Initializing the Coins**********************************/
+        /*******************************Initializing the Coins & obstacles**********************************/
         // Just loading any positions for coins now but later should be loaded from file ?
         // for now just put coins everywhere
         
-        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['coin']);
+        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['coin'], this.scoremanager);
+        this.obstacles = new Obstacles(this.gl, this.obstaclesprogram, this.meshes['obstacle'], this.scoremanager);
         
         /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
 
@@ -130,6 +145,7 @@ export default class MainGame extends Scene {
         this.player.Draw(VP,this.camera.getposition(), deltaTime);
 
         this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
+        this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
     }
     
     public end(): void {
