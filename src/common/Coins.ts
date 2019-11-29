@@ -17,26 +17,32 @@ export default class Coins extends Collider {
         this.CoinsMesh = coinsmesh;
     }
 
-    public Draw (deltaTime: number, VP : mat4)
+    public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3)
     {
         this.coinsMat = mat4.clone(VP);
 
-        for (var i = -1000; i < 1000; i += 5)
+        for (var i = 0; i < 2000; i += 5)
         {
-            this.drawCoin(0, i);
-            this.drawCoin(1, i);
-            this.drawCoin(2, i);
+            this.drawCoin(0, i, playerPos, cameraPos);
+            this.drawCoin(1, i, playerPos, cameraPos);
+            this.drawCoin(2, i, playerPos, cameraPos);
         }
     }
 
-    public didCollide() : boolean
+    public didCollide(coinLane : number, coinDistance : number, playerPos : number, cameraPos : vec3) : boolean
     {
-
-
-        return true;
+        if (coinLane == playerPos)
+        {
+            console.log(coinDistance);
+            if ((coinDistance >= (cameraPos[2] - 50)) && (coinDistance <= (cameraPos[2] + 50)))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
-    private drawCoin(lane : Number, distance : number) : void
+    private drawCoin(lane : number, distance : number, playerPos : number, cameraPos : vec3) : void
     {
         var coinMat = mat4.clone(this.coinsMat);
         mat4.scale(coinMat, coinMat, [0.3, 0.3, 0.3]);
@@ -52,9 +58,12 @@ export default class Coins extends Collider {
             mat4.translate(coinMat, coinMat, [-6, 0, 0]);
         }
 
-        this.CoinsProgram.use();
-        this.CoinsProgram.setUniformMatrix4fv("MVP", false, coinMat);
-        this.CoinsProgram.setUniform4f("tint", [1, 1, 1, 1]);
-        this.CoinsMesh.draw(this.gl.TRIANGLES);
+        if (!this.didCollide(lane, distance, playerPos, cameraPos))
+        {
+            this.CoinsProgram.use();
+            this.CoinsProgram.setUniformMatrix4fv("MVP", false, coinMat);
+            this.CoinsProgram.setUniform4f("tint", [1, 1, 1, 1]);
+            this.CoinsMesh.draw(this.gl.TRIANGLES);
+        }
     }
 }

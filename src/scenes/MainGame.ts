@@ -26,8 +26,7 @@ export default class MainGame extends Scene {
     playerMat: mat4
     roadMat : mat4;
     road : Road;
-    coins : Coins;              // first parameter is lane [0=>left, 1=>middle, 2=>right] // for consistency with player
-    coinsPositions : Int16Array;    // Second paramter is distance from start of plane      
+    coins : Coins;             
 
     public load(): void {
         this.game.loader.load({
@@ -130,7 +129,7 @@ export default class MainGame extends Scene {
 
         this.player.Draw(VP,this.camera.getposition(), deltaTime);
 
-        this.coins.Draw(deltaTime, VP);
+        this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition());
     }
     
     public end(): void {
