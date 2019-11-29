@@ -9,39 +9,63 @@ export default class Coins extends Collider {
     CoinsProgram : ShaderProgram;
     CoinsTexture : WebGLTexture;
     CoinsMesh : Mesh;
+    previousHitsLane : number[];
+    previousHitsDistance : number[];
+    previousHitsTime : number[];
     
     public constructor (GL : WebGL2RenderingContext, coinsprogram : ShaderProgram, coinsmesh : Mesh)
     {
         super(GL);
         this.CoinsProgram = coinsprogram;
         this.CoinsMesh = coinsmesh;
+        this.previousHitsLane = new Array<number>();
+        this.previousHitsDistance = new Array<number>();
+        this.previousHitsTime = new Array<number>();
     }
 
-    public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3)
+    public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number)
     {
         this.coinsMat = mat4.clone(VP);
 
         for (var i = 0; i < 500; i += 5)
         {
-            this.drawCoin(0, i, playerPos, cameraPos);
-            this.drawCoin(1, i, playerPos, cameraPos);
-            this.drawCoin(2, i, playerPos, cameraPos);
+            this.drawCoin(0, i, playerPos, cameraPos, time);
+            this.drawCoin(1, i, playerPos, cameraPos, time);
+            this.drawCoin(2, i, playerPos, cameraPos, time);
         }
     }
 
-    public didCollide(coinLane : number, coinDistance : number, playerPos : number, cameraPos : vec3) : boolean
+    public didCollide(coinLane : number, coinDistance : number, playerPos : number, cameraPos : vec3, time : number) : boolean
     {
-        if (coinLane == playerPos)
+        if (this.previousHitsDistance.includes(coinDistance))
         {
-            if ((coinDistance >= (cameraPos[2] - 10)) && (coinDistance <= (cameraPos[2] + 10)))
+            var index = this.previousHitsDistance.indexOf(coinDistance);
+            if (this.previousHitsLane[index] == coinLane)
             {
+                if ((time - this.previousHitsTime[index]) > 5)
+                {
+                    this.previousHitsDistance.splice(index, 1);
+                    this.previousHitsLane.splice(index, 1);
+                    this.previousHitsTime.splice(index, 1);
+                }
                 return true;
             }
         }
+        if (coinLane == playerPos)
+        {
+            if ((coinDistance >= (cameraPos[2] - 1)) && (coinDistance <= (cameraPos[2] + 4)))
+            {
+                this.previousHitsLane.push(coinLane);
+                this.previousHitsDistance.push(coinDistance);
+                this.previousHitsTime.push(time);
+                return true;
+            }
+        }
+
         return false;
     }
 
-    private drawCoin(lane : number, distance : number, playerPos : number, cameraPos : vec3) : void
+    private drawCoin(lane : number, distance : number, playerPos : number, cameraPos : vec3, time : number) : void
     {
         var coinMat = mat4.clone(this.coinsMat);
 
@@ -58,7 +82,7 @@ export default class Coins extends Collider {
             mat4.translate(coinMat, coinMat, [-6, 0, 0]);
         }
 
-        if (!this.didCollide(lane, distance, playerPos, cameraPos))
+        if (!this.didCollide(lane, distance, playerPos, cameraPos, time))
         {
             this.CoinsProgram.use();
             this.CoinsProgram.setUniformMatrix4fv("MVP", false, coinMat);

@@ -129,7 +129,7 @@ export default class MainGame extends Scene {
 
         this.player.Draw(VP,this.camera.getposition(), deltaTime);
 
-        this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition());
+        this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
     }
     
     public end(): void {
