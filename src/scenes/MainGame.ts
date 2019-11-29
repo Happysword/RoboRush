@@ -146,6 +146,8 @@ export default class MainGame extends Scene {
 
         this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
         this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
+
+        // Here should draw score ?
     }
     
     public end(): void {

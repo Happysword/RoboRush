@@ -1,6 +1,6 @@
 import { vec3, mat4 } from 'gl-matrix';
 
-//This is the abstract base of all objects that collide with player
+//This is the abstract base of all objects that collide with player should inherit from
 export default abstract class Collider {
     gl: WebGL2RenderingContext;
     public constructor(GL : WebGL2RenderingContext){

@@ -57,7 +57,7 @@ export default class Player {
     {
         mat4.translate(this.PlayerMat,this.PlayerMat,[0,-1,1])
 
-        if(this.playerdirection == 1 && this.playerposition == 1)//forzzm middle to left working
+        if(this.playerdirection == 1 && this.playerposition == 1)//from middle to left working
         {
             mat4.translate(this.PlayerMat,this.PlayerMat,[this.xposition,0,0])
             if(this.xposition < 0.8 ) this.xposition += 0.05;

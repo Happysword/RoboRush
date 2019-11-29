@@ -29,7 +29,8 @@ export default class Coins extends Collider {
     public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number)
     {
         this.coinsMat = mat4.clone(VP);
-
+        // Draw all coins here should put (Lane of Coin, distance of coin, leave the rest as is)
+        // Lane of Coin 0=>left lane, 1=>middle lane, 2=>right lane 
         for (var i = 0; i < 500; i += 5)
         {
             this.drawCoin(1, i, playerPos, cameraPos, time);
@@ -38,6 +39,8 @@ export default class Coins extends Collider {
 
     public didCollide(coinLane : number, coinDistance : number, playerPos : number, cameraPos : vec3, time : number) : boolean
     {
+        // First check if object collided with player before
+        // if collided then don't draw for 5 seconds (5=>respawn time)
         if (this.previousHitsDistance.includes(coinDistance))
         {
             var index = this.previousHitsDistance.indexOf(coinDistance);
@@ -52,8 +55,11 @@ export default class Coins extends Collider {
                 return true;
             }
         }
+        // if coin not collided before and collided with user then don't draw it
         if (coinLane == playerPos)
         {
+            // in the left bracket value of collision distance to calculate from behind user
+            // in the right bracket value of collision distance to calculate from infront of user
             if ((coinDistance >= (cameraPos[2])) && (coinDistance <= (cameraPos[2] + 2.5)))
             {
                 this.previousHitsLane.push(coinLane);
@@ -69,21 +75,25 @@ export default class Coins extends Collider {
 
     private drawCoin(lane : number, distance : number, playerPos : number, cameraPos : vec3, time : number) : void
     {
+        // put coin in right place
         var coinMat = mat4.clone(this.coinsMat);
 
         mat4.translate(coinMat, coinMat, [0, 0.5, distance]);
 
         mat4.scale(coinMat, coinMat, [0.3, 0.3, 0.3]);
 
+        // left lane
         if (lane == 0)
         {
             mat4.translate(coinMat, coinMat, [6, 0, 0]);
         }
-        else if (lane == 2)
+        else if (lane == 2) // right lane
         {
             mat4.translate(coinMat, coinMat, [-6, 0, 0]);
         }
+        // else middle
 
+        // if collided then don't draw
         if (!this.didCollide(lane, distance, playerPos, cameraPos, time))
         {
             this.CoinsProgram.use();

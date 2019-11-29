@@ -32,6 +32,8 @@ export default class Obstacles extends Collider {
 
         for (var i = 0; i < 500; i += 5)
         {
+            // Draw all obstacles here should put (Lane of obstacle, distance of obstacle, leave the rest as is)
+            // Lane of obstacle 0=>left lane, 1=>middle lane, 2=>right lane 
             this.drawObstacle(0, i, playerPos, cameraPos, time);
             this.drawObstacle(2, i, playerPos, cameraPos, time);
         }
@@ -39,6 +41,8 @@ export default class Obstacles extends Collider {
 
     public didCollide(obstacleLane : number, obstacleDistance : number, playerPos : number, cameraPos : vec3, time : number) : boolean
     {
+        // First check if object collided with player before
+        // if collided then don't draw for 5 seconds (5=>respawn time)
         if (this.previousHitsDistance.includes(obstacleDistance))
         {
             var index = this.previousHitsDistance.indexOf(obstacleDistance);
@@ -53,8 +57,11 @@ export default class Obstacles extends Collider {
                 return true;
             }
         }
+        // if obstacle not collided before and collided with user then don't draw it
         if (obstacleLane == playerPos)
         {
+            // in the left bracket value of collision distance to calculate from behind user
+            // in the right bracket value of collision distance to calculate from infront of user
             if ((obstacleDistance >= (cameraPos[2])) && (obstacleDistance <= (cameraPos[2] + 2.5)))
             {
                 this.previousHitsLane.push(obstacleLane);
@@ -70,21 +77,24 @@ export default class Obstacles extends Collider {
 
     private drawObstacle(lane : number, distance : number, playerPos : number, cameraPos : vec3, time : number) : void
     {
+        // put obstacle in right place
         var obstacleMat = mat4.clone(this.obstaclesMat);
 
         mat4.translate(obstacleMat, obstacleMat, [0, 0.5, distance]);
 
         mat4.scale(obstacleMat, obstacleMat, [0.3, 0.3, 0.3]);
 
-        if (lane == 0)
+        if (lane == 0)  // left lane
         {
             mat4.translate(obstacleMat, obstacleMat, [6, 0, 0]);
         }
-        else if (lane == 2)
+        else if (lane == 2) // right lane
         {
             mat4.translate(obstacleMat, obstacleMat, [-6, 0, 0]);
         }
+        // else middle lane
 
+        // if collided then don't draw
         if (!this.didCollide(lane, distance, playerPos, cameraPos, time))
         {
             this.ObstaclesProgram.use();
