@@ -33,7 +33,6 @@ export default class Coins extends Collider {
     {
         if (coinLane == playerPos)
         {
-            console.log(coinDistance);
             if ((coinDistance >= (cameraPos[2] - 50)) && (coinDistance <= (cameraPos[2] + 50)))
             {
                 return true;
