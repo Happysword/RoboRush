@@ -69,7 +69,7 @@ export default class Player {
         this.MovePlayerHeadDirection();
 
         mat4.scale(this.PlayerHeadMat,this.PlayerHeadMat,[0.2,0.2,0.2])
-        mat4.rotateY(this.PlayerHeadMat , this.PlayerHeadMat , this.time * 4);
+        mat4.rotateY(this.PlayerHeadMat , this.PlayerHeadMat , Math.cos( this.time * 0.7  ) * Math.sin( this.time * 2  )* 4);
         mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0.25,-1.3,0]);
         this.PlayerHeadProgram.setUniformMatrix4fv("MVP", false, this.PlayerHeadMat);
         this.PlayerHeadProgram.setUniform4f("tint", [1, 1, 1, 1]);
