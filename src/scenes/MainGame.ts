@@ -42,14 +42,18 @@ export default class MainGame extends Scene {
             ["BlueColor.frag"]:{url:'shaders/BlueColor.frag', type:'text'},
             ["GreenColor.vert"]:{url:'shaders/GreenColor.vert', type:'text'},
             ["GreenColor.frag"]:{url:'shaders/GreenColor.frag', type:'text'},
-            ["RoboBody.vert"]:{url:'shaders/Road.vert', type:'text'},
-            ["RoboBody.frag"]:{url:'shaders/Road.frag', type:'text'},
+            ["RoboBody.vert"]:{url:'shaders/RoboBody.vert', type:'text'},
+            ["RoboBody.frag"]:{url:'shaders/RoboBody.frag', type:'text'},
+            ["RoboHead.vert"]:{url:'shaders/RoboHead.vert', type:'text'},
+            ["RoboHead.frag"]:{url:'shaders/RoboHead.frag', type:'text'},
             ["Road.vert"]:{url:'shaders/Road.vert', type:'text'},
             ["Road.frag"]:{url:'shaders/Road.frag', type:'text'},
             ["RoadPlane"]:{url:'models/RoadPlane.obj', type:'text'},
             ["RoboBodyMesh"]:{url:'models/RoboBody.obj', type:'text'},
+            ["RoboHeadMesh"]:{url:'models/RoboHead.obj', type:'text'},
             ["road-texture"]:{url:'images/Three_lane_road.png', type:'image'},
-            ["RoboBody-texture"]:{url:'images/BodydiffMAP.jpg', type:'image'}
+            ["RoboBody-texture"]:{url:'images/BodydiffMAP.jpg', type:'image'},
+            ["RoboHead-texture"]:{url:'images/HEADdiffMAP.jpg', type:'image'}
         });
     } 
     
@@ -85,6 +89,7 @@ export default class MainGame extends Scene {
 
         this.meshes['road'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoadPlane"]);
         this.meshes['RoboBody'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoboBodyMesh"]);
+        this.meshes['RoboHead'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoboHeadMesh"]);
         this.meshes['coin'] = MeshUtils.Sphere(this.gl);
         this.meshes['obstacle'] = MeshUtils.Sphere(this.gl);
 
@@ -110,6 +115,16 @@ export default class MainGame extends Scene {
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
 
+        this.textures['RoboHead'] = this.gl.createTexture();
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures['RoboHead']);
+        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 4);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.game.loader.resources['RoboHead-texture']);
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+
         /*******************************  Initializing the Camera *******************************/
 
         this.camera = new Camera();
@@ -119,7 +134,7 @@ export default class MainGame extends Scene {
         this.camera.aspectRatio = this.gl.drawingBufferWidth/this.gl.drawingBufferHeight;
 
         /*******************************Initializing the player & score**********************************/
-        this.player = new Player( this.playerBodyprogram,this.meshes['RoboBody'],this.gl,this.game.input , this.textures['RoboBody']); 
+        this.player = new Player( this.playerBodyprogram, this.playerHeadprogram ,this.meshes['RoboBody'], this.meshes['RoboHead'] ,this.gl,this.game.input , this.textures['RoboBody'] ,this.textures['RoboHead']); 
         this.scoremanager = new ScoreManager();
 
         /*******************************Initializing the Coins & obstacles**********************************/
