@@ -17,7 +17,8 @@ import ScoreManager from '../common/ScoreManager';
 export default class MainGame extends Scene {
     
     roadProgram: ShaderProgram;
-    playerprogram: ShaderProgram;
+    playerBodyprogram: ShaderProgram;
+    playerHeadprogram: ShaderProgram;
     coinsprogram: ShaderProgram;
     obstaclesprogram : ShaderProgram;
     time: number = 0;
@@ -41,10 +42,14 @@ export default class MainGame extends Scene {
             ["BlueColor.frag"]:{url:'shaders/BlueColor.frag', type:'text'},
             ["GreenColor.vert"]:{url:'shaders/GreenColor.vert', type:'text'},
             ["GreenColor.frag"]:{url:'shaders/GreenColor.frag', type:'text'},
+            ["RoboBody.vert"]:{url:'shaders/Road.vert', type:'text'},
+            ["RoboBody.frag"]:{url:'shaders/Road.frag', type:'text'},
             ["Road.vert"]:{url:'shaders/Road.vert', type:'text'},
             ["Road.frag"]:{url:'shaders/Road.frag', type:'text'},
             ["RoadPlane"]:{url:'models/RoadPlane.obj', type:'text'},
-            ["road-texture"]:{url:'images/Three_lane_road.png', type:'image'}
+            ["RoboBodyMesh"]:{url:'models/RoboBody.obj', type:'text'},
+            ["road-texture"]:{url:'images/Three_lane_road.png', type:'image'},
+            ["RoboBody-texture"]:{url:'images/BodydiffMAP.jpg', type:'image'}
         });
     } 
     
@@ -56,10 +61,15 @@ export default class MainGame extends Scene {
         this.roadProgram.attach(this.game.loader.resources["Road.frag"], this.gl.FRAGMENT_SHADER);
         this.roadProgram.link();
 
-        this.playerprogram = new ShaderProgram(this.gl);
-        this.playerprogram.attach(this.game.loader.resources["RedColor.vert"], this.gl.VERTEX_SHADER);
-        this.playerprogram.attach(this.game.loader.resources["RedColor.frag"], this.gl.FRAGMENT_SHADER);
-        this.playerprogram.link();
+        this.playerBodyprogram = new ShaderProgram(this.gl);
+        this.playerBodyprogram.attach(this.game.loader.resources["RoboBody.vert"], this.gl.VERTEX_SHADER);
+        this.playerBodyprogram.attach(this.game.loader.resources["RoboBody.frag"], this.gl.FRAGMENT_SHADER);
+        this.playerBodyprogram.link();
+
+        this.playerHeadprogram = new ShaderProgram(this.gl);
+        this.playerHeadprogram.attach(this.game.loader.resources["RoboHead.vert"], this.gl.VERTEX_SHADER);
+        this.playerHeadprogram.attach(this.game.loader.resources["RoboHead.frag"], this.gl.FRAGMENT_SHADER);
+        this.playerHeadprogram.link();
 
         this.coinsprogram = new ShaderProgram(this.gl);
         this.coinsprogram.attach(this.game.loader.resources["BlueColor.vert"], this.gl.VERTEX_SHADER);
@@ -74,7 +84,7 @@ export default class MainGame extends Scene {
         /*******************************  Initializing all the models *******************************/
 
         this.meshes['road'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoadPlane"]);
-        this.meshes['player'] = MeshUtils.Sphere(this.gl);
+        this.meshes['RoboBody'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoboBodyMesh"]);
         this.meshes['coin'] = MeshUtils.Sphere(this.gl);
         this.meshes['obstacle'] = MeshUtils.Sphere(this.gl);
 
@@ -90,6 +100,16 @@ export default class MainGame extends Scene {
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
 
+        this.textures['RoboBody'] = this.gl.createTexture();
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures['RoboBody']);
+        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 4);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.game.loader.resources['RoboBody-texture']);
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+
         /*******************************  Initializing the Camera *******************************/
 
         this.camera = new Camera();
@@ -99,7 +119,7 @@ export default class MainGame extends Scene {
         this.camera.aspectRatio = this.gl.drawingBufferWidth/this.gl.drawingBufferHeight;
 
         /*******************************Initializing the player & score**********************************/
-        this.player = new Player( this.playerprogram,this.meshes['player'],this.gl,this.game.input); 
+        this.player = new Player( this.playerBodyprogram,this.meshes['RoboBody'],this.gl,this.game.input , this.textures['RoboBody']); 
         this.scoremanager = new ScoreManager();
 
         /*******************************Initializing the Coins & obstacles**********************************/

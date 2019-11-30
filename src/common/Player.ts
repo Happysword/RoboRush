@@ -6,7 +6,7 @@ import Input from '../common/input';
 export default class Player {
 
     PlayerMat : mat4;
-    PlayerProgram : ShaderProgram;
+    PlayerBodyProgram : ShaderProgram;
     gl : WebGL2RenderingContext;
     pPlayerTexture : WebGLTexture;
     PlayerMesh : Mesh;
@@ -15,27 +15,35 @@ export default class Player {
     playerposition: number = 1; //zero for left, one for middle , two for right
     xposition : number = 0 ;
     inputer: Input;
+    roboBodyTexture : WebGLTexture;
+    time: number = 0;
 
-    constructor( Playerprogram : ShaderProgram, playermesh : Mesh, GL : WebGL2RenderingContext, input:Input)
+    constructor( Playerbodyprogram : ShaderProgram, playermesh : Mesh, GL : WebGL2RenderingContext, input:Input , bodyTexture : WebGLTexture)
     {
-        this.PlayerProgram = Playerprogram;
+        this.PlayerBodyProgram = Playerbodyprogram;
         this.PlayerMesh = playermesh;
         this.gl = GL;
         this.inputer = input;
+        this.roboBodyTexture = bodyTexture;
     }
 
 
     public Draw (VP : mat4 ,camerapos : vec3 , DeltaTime : number )
     {
+        this.time += DeltaTime / 1000; 
         this.PlayerMat = mat4.clone(VP);
-        this.deltaTime = DeltaTime; 
         mat4.translate(this.PlayerMat,this.PlayerMat,camerapos);
-        this.PlayerProgram.use();
+        this.PlayerBodyProgram.use();
+        
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.roboBodyTexture);
+        this.PlayerBodyProgram.setUniform1i('texture_sampler', 0);
+        
         this.setPlayerDirection();
         this.MovePlayerDirection();
         mat4.scale(this.PlayerMat,this.PlayerMat,[0.2,0.2,0.2])
-        this.PlayerProgram.setUniformMatrix4fv("MVP", false, this.PlayerMat);
-        this.PlayerProgram.setUniform4f("tint", [1, 1, 1, 1]);
+        mat4.rotateX(this.PlayerMat , this.PlayerMat , this.time * 9);
+        this.PlayerBodyProgram.setUniformMatrix4fv("MVP", false, this.PlayerMat);
+        this.PlayerBodyProgram.setUniform4f("tint", [1, 1, 1, 1]);
         this.PlayerMesh.draw(this.gl.TRIANGLES);
 
     }
