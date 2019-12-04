@@ -94,7 +94,12 @@ export default class Player {
     {
         mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,-1,1])
 
-        if(this.playerdirection == 1 && this.playerposition == 1)//from middle to left working
+        if(this.playerdirection == 0 && this.playerposition == 1)
+        {
+            this.xposition = 0;
+            mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[this.xposition,0,0]);
+        }
+        else if(this.playerdirection == 1 && this.playerposition == 1)//from middle to left working
         {
             mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[this.xposition,0,0])
             if(this.xposition < 0.8 ) this.xposition += 0.05;
@@ -110,16 +115,16 @@ export default class Player {
 
         else if(this.playerdirection == 2 && this.playerposition == 0)//from left to middle working
         {
-            mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[this.xposition,0,0])
             if(this.xposition > 0) this.xposition -= 0.05;
             else{this.playerdirection = 0 ;this.playerposition = 1;}
+            mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[this.xposition,0,0])
         }
         
         else if(this.playerdirection == 1 && this.playerposition == 2)//from right to middle working
         {
-            mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[this.xposition,0,0])
             if(this.xposition < 0) this.xposition += 0.05;
             else{this.playerdirection = 0 ;this.playerposition = 1;}
+            mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[this.xposition,0,0])
         }
 
         else if(this.playerdirection == 0 || (this.playerdirection == 1 && this.playerposition == 0) || (this.playerdirection == 2 && this.playerposition == 2))
