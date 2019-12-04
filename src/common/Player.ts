@@ -79,11 +79,12 @@ export default class Player {
 
     private setPlayerDirection()
     {
-        if(this.inputer.isKeyJustDown("ArrowLeft"))
+
+        if(this.playerdirection == 0 && this.inputer.isKeyJustDown("ArrowLeft"))
        {   
             this.playerdirection = 1;
        }
-       else if(this.inputer.isKeyJustDown("ArrowRight"))
+       else if(this.playerdirection == 0 && this.inputer.isKeyJustDown("ArrowRight"))
        {
             this.playerdirection = 2;
        }
@@ -129,6 +130,7 @@ export default class Player {
 
         else if(this.playerdirection == 0 || (this.playerdirection == 1 && this.playerposition == 0) || (this.playerdirection == 2 && this.playerposition == 2))
         {
+            this.playerdirection = 0;
             mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[this.xposition,0,0]);
         }    
 
