@@ -216,7 +216,7 @@ export default class MainGame extends Scene {
         
         this.road = new Road(VP , this.roadProgram ,  this.textures['road'] ,this.meshes['road'] , this.gl , deltaTime );
         
-        this.road.drawRoad(100);      // Draws Infinite Plane With X planes to be repeated
+        this.road.drawRoad(500);      // Draws Infinite Plane With X planes to be repeated
         
         this.camera.Move(600 , 0.3 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
         
