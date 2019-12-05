@@ -16,6 +16,8 @@ export default class Player {
     deltaTime : number;
     playerdirection : number = 0 ; //zero moving straight , one moving to the left , two moving to the right
     playerposition: number = 1; //zero for left, one for middle , two for right
+    timeofjumppress: number = 0; //time the player pressed the jump key
+    isjumping : Boolean = false;// is in jump animation or not 
     xposition : number = 0 ;
     inputer: Input;
     roboBodyTexture : WebGLTexture;
@@ -50,6 +52,8 @@ export default class Player {
         
         this.setPlayerDirection();
         this.MovePlayerDirection();
+        this.setPlayerJump(this.time);
+        this.MovePlayerJump(this.time);
         mat4.scale(this.PlayerBodyMat,this.PlayerBodyMat,[0.2,0.2,0.2])
         mat4.rotateX(this.PlayerBodyMat , this.PlayerBodyMat , this.time * 9);
         this.PlayerBodyProgram.setUniformMatrix4fv("MVP", false, this.PlayerBodyMat);
@@ -67,6 +71,7 @@ export default class Player {
         this.PlayerHeadProgram.setUniform1i('texture_sampler', 0);
 
         this.MovePlayerHeadDirection();
+        this.MovePlayerHeadJump(this.time);
 
         mat4.scale(this.PlayerHeadMat,this.PlayerHeadMat,[0.2,0.2,0.2])
         mat4.rotateY(this.PlayerHeadMat , this.PlayerHeadMat , Math.cos( this.time * 0.7  ) * Math.sin( this.time * 2  )* 4);
@@ -91,9 +96,59 @@ export default class Player {
        
     }
 
+    private setPlayerJump( deltatime : number )
+    {
+        if(this.isjumping == false && this.inputer.isKeyJustDown(" "))
+        {
+            this.isjumping = true;
+            this.timeofjumppress = deltatime;
+        }
+
+    }
+
+    private MovePlayerJump(timenow : number)
+    {
+        mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,-1,0])
+        
+        if(this.isjumping == true)
+        {
+            let jumpduration = 0.5;
+            let timepassed = timenow - this.timeofjumppress;
+            let jumpdisplacement = Math.PI/2*(timepassed / jumpduration);
+
+            if(timepassed < 2*jumpduration)
+            { mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,  0.5 * Math.sin(jumpdisplacement) ,0]) }
+            
+            else 
+            { this.isjumping = false }
+
+        }
+
+    }
+
+    private MovePlayerHeadJump(timenow : number)
+    {
+        mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,-1,0])
+        
+        if(this.isjumping == true)
+        {
+            let jumpduration = 0.5;
+            let timepassed = timenow - this.timeofjumppress;
+            let jumpdisplacement = Math.PI/2*(timepassed / jumpduration);
+
+            if(timepassed < 2*jumpduration)
+            { mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,  0.5 * Math.sin(jumpdisplacement) ,0]) }
+            
+            else 
+            { this.isjumping = false }
+
+        }
+
+    }
+
     private MovePlayerDirection()
     {
-        mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,-1,1])
+        mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,0,1])
 
         if(this.playerdirection == 0 && this.playerposition == 1)
         {
@@ -138,7 +193,7 @@ export default class Player {
 
     private MovePlayerHeadDirection()
     {
-        mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,-1,1]) //for the head
+        mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,0,1]) //for the head
 
         if(this.playerdirection == 1 && this.playerposition == 1)//from middle to left working
         {
