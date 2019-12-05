@@ -19,6 +19,7 @@ export default class Player {
     timeofjumppress: number = 0; //time the player pressed the jump key
     isjumping : Boolean = false;// is in jump animation or not 
     xposition : number = 0 ;
+    jumpposition : number = 0; 
     inputer: Input;
     roboBodyTexture : WebGLTexture;
     roboHeadTexture : WebGLTexture;
@@ -135,12 +136,13 @@ export default class Player {
             let jumpduration = 0.5;
             let timepassed = timenow - this.timeofjumppress;
             let jumpdisplacement = Math.PI/2*(timepassed / jumpduration);
+            this.jumpposition = Math.sin(jumpdisplacement);
 
             if(timepassed < 2*jumpduration)
             { mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,  0.5 * Math.sin(jumpdisplacement) ,0]) }
             
             else 
-            { this.isjumping = false }
+            { this.isjumping = false; this.jumpposition = 0; }
 
         }
 
@@ -228,6 +230,12 @@ export default class Player {
             mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[this.xposition,0,0]);
         }    
 
+    }
+
+    //returns a position scaled from 0-10 of the player in the y-axis from the ground:0 to the max height:10
+    public getscaledyposition ()
+    { 
+        return this.jumpposition*10;
     }
 
 }
