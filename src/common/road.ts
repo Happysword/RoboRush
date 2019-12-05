@@ -110,8 +110,6 @@ export default class Road {
             this.roadMesh.draw(this.gl.TRIANGLES); 
         }
 
-        
-
     }
 
     public CheckRoadTimePassed(passedTime: number)
