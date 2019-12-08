@@ -3,9 +3,11 @@ import ShaderProgram from './shader-program';
 import Mesh from '../common/mesh';
 import Collider from './colliders';
 import ScoreManager from './ScoreManager';
+import Player from './Player';
 
 export default class Coins extends Collider {
 
+    player : Player
     coinsMat : mat4;
     CoinsProgram : ShaderProgram;
     CoinsTexture : WebGLTexture;
@@ -15,7 +17,7 @@ export default class Coins extends Collider {
     previousHitsTime : number[];
     scoremanager : ScoreManager;
     
-    public constructor (GL : WebGL2RenderingContext, coinsprogram : ShaderProgram, coinsmesh : Mesh, scoresManager : ScoreManager)
+    public constructor (GL : WebGL2RenderingContext, coinsprogram : ShaderProgram, coinsmesh : Mesh, scoresManager : ScoreManager, playerinst : Player)
     {
         super(GL);
         this.CoinsProgram = coinsprogram;
@@ -24,6 +26,7 @@ export default class Coins extends Collider {
         this.previousHitsDistance = new Array<number>();
         this.previousHitsTime = new Array<number>();
         this.scoremanager = scoresManager;
+        this.player = playerinst;
     }
 
     public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number)
@@ -56,17 +59,20 @@ export default class Coins extends Collider {
             }
         }
         // if coin not collided before and collided with user then don't draw it
-        if (coinLane == playerPos)
+        if (!((this.player.getscaledyposition() > 5) && (this.player.isjumping)))
         {
-            // in the left bracket value of collision distance to calculate from behind user
-            // in the right bracket value of collision distance to calculate from infront of user
-            if ((coinDistance >= (cameraPos[2])) && (coinDistance <= (cameraPos[2] + 2.5)))
+            if (coinLane == playerPos)
             {
-                this.previousHitsLane.push(coinLane);
-                this.previousHitsDistance.push(coinDistance);
-                this.previousHitsTime.push(time);
-                this.scoremanager.ChangeScore(1);
-                return true;
+                // in the left bracket value of collision distance to calculate from behind user
+                // in the right bracket value of collision distance to calculate from infront of user
+                if ((coinDistance >= (cameraPos[2])) && (coinDistance <= (cameraPos[2] + 2.5)))
+                {
+                    this.previousHitsLane.push(coinLane);
+                    this.previousHitsDistance.push(coinDistance);
+                    this.previousHitsTime.push(time);
+                    this.scoremanager.ChangeScore(1);
+                    return true;
+                }
             }
         }
 

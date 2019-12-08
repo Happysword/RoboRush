@@ -34,7 +34,6 @@ export default class Obstacles extends Collider {
         {
             // Draw all obstacles here should put (Lane of obstacle, distance of obstacle, leave the rest as is)
             // Lane of obstacle 0=>left lane, 1=>middle lane, 2=>right lane 
-            this.drawObstacle(0, i, playerPos, cameraPos, time);
             this.drawObstacle(2, i, playerPos, cameraPos, time);
         }
     }

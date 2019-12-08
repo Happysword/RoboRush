@@ -12,6 +12,7 @@ import Input from '../common/input';
 import Player from '../common/Player';
 import Coins from '../common/Coins';
 import Obstacles from '../common/Obstacles';
+import Spikes from '../common/Spikes';
 import ScoreManager from '../common/ScoreManager';
 import SkyBox from '../common/SkyBox';
 
@@ -22,6 +23,7 @@ export default class MainGame extends Scene {
     playerHeadprogram: ShaderProgram;
     coinsprogram: ShaderProgram;
     obstaclesprogram : ShaderProgram;
+    spikesprogram : ShaderProgram;
     skyBoxProgram : ShaderProgram;
     samplerCubeMap: WebGLSampler;
     time: number = 0;
@@ -34,7 +36,8 @@ export default class MainGame extends Scene {
     roadMat : mat4;
     road : Road;
     coins : Coins; 
-    obstacles : Obstacles;  
+    obstacles : Obstacles;
+    spikes : Spikes;  
     scoremanager : ScoreManager;   
     skyBox : SkyBox;
     
@@ -94,6 +97,11 @@ export default class MainGame extends Scene {
         this.obstaclesprogram.attach(this.game.loader.resources["GreenColor.frag"], this.gl.FRAGMENT_SHADER);
         this.obstaclesprogram.link();
 
+        this.spikesprogram = new ShaderProgram(this.gl);
+        this.spikesprogram.attach(this.game.loader.resources["RedColor.vert"], this.gl.VERTEX_SHADER);
+        this.spikesprogram.attach(this.game.loader.resources["RedColor.frag"], this.gl.FRAGMENT_SHADER);
+        this.spikesprogram.link();
+
         this.skyBoxProgram = new ShaderProgram(this.gl);
         this.skyBoxProgram.attach(this.game.loader.resources["skybox.vert"], this.gl.VERTEX_SHADER);
         this.skyBoxProgram.attach(this.game.loader.resources["skybox.frag"], this.gl.FRAGMENT_SHADER);
@@ -118,6 +126,7 @@ export default class MainGame extends Scene {
         this.meshes['RoboHead'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoboHeadMesh"]);
         this.meshes['coin'] = MeshUtils.Sphere(this.gl);
         this.meshes['obstacle'] = MeshUtils.Sphere(this.gl);
+        this.meshes['spike'] = MeshUtils.Sphere(this.gl);
         this.meshes['cubeMapMesh'] = MeshUtils.Cube(this.gl);
         
         /*******************************  Initializing all the textures *******************************/
@@ -181,8 +190,9 @@ export default class MainGame extends Scene {
         // Just loading any positions for coins now but later should be loaded from file ?
         // for now just put coins everywhere
         
-        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['coin'], this.scoremanager);
+        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['coin'], this.scoremanager, this.player);
         this.obstacles = new Obstacles(this.gl, this.obstaclesprogram, this.meshes['obstacle'], this.scoremanager);
+        this.spikes = new Spikes(this.gl, this.spikesprogram, this.meshes['spike'], this.scoremanager, this.player);
         
         /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
         
@@ -224,7 +234,8 @@ export default class MainGame extends Scene {
         
         this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
         this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
-        
+        this.spikes.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
+
         // Here should draw score ? NO not here but DOLA will do it by html and css
         
         }
