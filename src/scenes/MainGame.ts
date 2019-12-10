@@ -226,9 +226,9 @@ export default class MainGame extends Scene {
         
         this.road = new Road(VP , this.roadProgram ,  this.textures['road'] ,this.meshes['road'] , this.gl , deltaTime );
         
-        this.road.drawRoad(500);      // Draws Infinite Plane With X planes to be repeated
+        this.road.drawRoad(500 , this.camera.position);      // Draws Infinite Plane With X planes to be repeated
         
-        this.camera.Move(600 , 0.3 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
+        this.camera.Move(600 , 0.1 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
         
         this.player.Draw(VP,this.camera.getposition(), deltaTime);
         
@@ -237,7 +237,7 @@ export default class MainGame extends Scene {
         this.spikes.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
 
         // Here should draw score ? NO not here but DOLA will do it by html and css
-        
+
         }
     
     public end(): void {
