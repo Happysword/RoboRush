@@ -57,7 +57,7 @@ export default class Player {
         this.setPlayerJump(this.time);
         this.MovePlayerJump(this.time);
         mat4.scale(this.PlayerBodyMat,this.PlayerBodyMat,[0.2,0.2,0.2])
-        mat4.rotateY(this.PlayerBodyMat , this.PlayerBodyMat , this.time * 9);
+        mat4.rotateX(this.PlayerBodyMat , this.PlayerBodyMat , this.time * 9);
         this.PlayerBodyProgram.setUniformMatrix4fv("VP", false, VP);
         this.PlayerBodyProgram.setUniform3f('cam_position' , camerapos);
         this.PlayerBodyProgram.setUniformMatrix4fv("MVP", false, this.PlayerBodyMat);
