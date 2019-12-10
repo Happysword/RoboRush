@@ -27,7 +27,7 @@ uniform vec4 tint;
 uniform sampler2D texture_sampler;
 uniform vec3 cam_position;
 
-vec3 lightAmbient = vec3(0.2,0.2,0.2);
+vec3 lightAmbient = vec3(0.4,0.4,0.4);
 vec3 lightDirection = vec3(-0.4,-0.8,0.5);
 vec3 lightDiffuse = vec3(0.5,0.5,0.5);
 vec3 lightSpecular = vec3(1.0,1.0,1.0);
