@@ -91,11 +91,11 @@ export default class Player {
     private setPlayerDirection()
     {
 
-        if(this.playerdirection == 0 && this.inputer.isKeyJustDown("ArrowLeft"))
+        if(this.playerdirection == 0 && (this.inputer.isKeyJustDown("ArrowLeft") || this.inputer.isKeyJustDown("a") ) )
        {   
             this.playerdirection = 1;
        }
-       else if(this.playerdirection == 0 && this.inputer.isKeyJustDown("ArrowRight"))
+       else if(this.playerdirection == 0 && (this.inputer.isKeyJustDown("ArrowRight") || this.inputer.isKeyJustDown("d") ) ) 
        {
             this.playerdirection = 2;
        }
