@@ -17,7 +17,7 @@ export default class Spikes extends Collider {
     previousHitsTime : number[];
     scoremanager : ScoreManager;
     
-    public constructor (GL : WebGL2RenderingContext, spikeprogram : ShaderProgram, spikemesh : Mesh, scoresManager : ScoreManager, playerinst : Player)
+    public constructor (GL : WebGL2RenderingContext, spikeprogram : ShaderProgram, spikemesh : Mesh, scoresManager : ScoreManager, playerinst : Player , spikeTexture : WebGLTexture)
     {
         super(GL);
         this.SpikesProgram = spikeprogram;
@@ -27,11 +27,16 @@ export default class Spikes extends Collider {
         this.previousHitsTime = new Array<number>();
         this.scoremanager = scoresManager;
         this.player = playerinst;
+        this.SpikesTexture = spikeTexture;
     }
 
     public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number)
     {
         this.SpikesMat = mat4.clone(VP);
+        
+        this.SpikesProgram.use();
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.SpikesTexture);
+        this.SpikesProgram.setUniform1i('texture_sampler', 0);
 
         for (var i = 0; i < 500; i += 5)
         {
@@ -102,7 +107,8 @@ export default class Spikes extends Collider {
         // if collided then don't draw
         if (!this.didCollide(lane, distance, playerPos, cameraPos, time))
         {
-            this.SpikesProgram.use();
+            mat4.scale(spikeMat , spikeMat , [2,2,2]);
+            mat4.translate(spikeMat, spikeMat, [0, -0.8, 0]);
             this.SpikesProgram.setUniformMatrix4fv("MVP", false, spikeMat);
             this.SpikesProgram.setUniform4f("tint", [1, 1, 1, 1]);
             this.SpikesMesh.draw(this.gl.TRIANGLES);

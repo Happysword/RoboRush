@@ -2,6 +2,7 @@ import { Scene } from '../common/game';
 import ShaderProgram from '../common/shader-program';
 import Mesh from '../common/mesh';
 import * as MeshUtils from '../common/mesh-utils';
+import * as TextureUtils from '../common/texture-utils';
 import Camera from '../common/camera';
 import FlyCameraController from '../common/camera-controllers/fly-camera-controller';
 import { vec2, vec3, mat4 } from 'gl-matrix';
@@ -45,8 +46,8 @@ export default class MainGame extends Scene {
 
     public load(): void {
         this.game.loader.load({
-            ["RedColor.vert"]:{url:'shaders/RedColor.vert', type:'text'},
-            ["RedColor.frag"]:{url:'shaders/RedColor.frag', type:'text'},
+            ["spikes.vert"]:{url:'shaders/spikes.vert', type:'text'},
+            ["spikes.frag"]:{url:'shaders/spikes.frag', type:'text'},
             ["BlueColor.vert"]:{url:'shaders/BlueColor.vert', type:'text'},
             ["BlueColor.frag"]:{url:'shaders/BlueColor.frag', type:'text'},
             ["GreenColor.vert"]:{url:'shaders/GreenColor.vert', type:'text'},
@@ -62,7 +63,9 @@ export default class MainGame extends Scene {
             ["RoadPlane"]:{url:'models/RoadPlane.obj', type:'text'},
             ["RoboBodyMesh"]:{url:'models/RoboBody.obj', type:'text'},
             ["RoboHeadMesh"]:{url:'models/RoboHead.obj', type:'text'},
+            ["spikesMesh"]:{url:'models/spikes.obj', type:'text'},
             ["road-texture"]:{url:'images/Three_lane_road.png', type:'image'},
+            ["spikes-texture"]:{url:'images/spikes-texture.jpg', type:'image'},
             ["RoboBody-texture"]:{url:'images/BodydiffMAP.jpg', type:'image'},
             ["RoboHead-texture"]:{url:'images/HEADdiffMAP.jpg', type:'image'},
             ...Object.fromEntries(MainGame.cubemapDirections.map(dir=>[dir, {url:`images/cubemappics/${dir}.jpg`, type:'image'}]))
@@ -98,8 +101,8 @@ export default class MainGame extends Scene {
         this.obstaclesprogram.link();
 
         this.spikesprogram = new ShaderProgram(this.gl);
-        this.spikesprogram.attach(this.game.loader.resources["RedColor.vert"], this.gl.VERTEX_SHADER);
-        this.spikesprogram.attach(this.game.loader.resources["RedColor.frag"], this.gl.FRAGMENT_SHADER);
+        this.spikesprogram.attach(this.game.loader.resources["spikes.vert"], this.gl.VERTEX_SHADER);
+        this.spikesprogram.attach(this.game.loader.resources["spikes.frag"], this.gl.FRAGMENT_SHADER);
         this.spikesprogram.link();
 
         this.skyBoxProgram = new ShaderProgram(this.gl);
@@ -124,42 +127,17 @@ export default class MainGame extends Scene {
         this.meshes['road'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoadPlane"]);
         this.meshes['RoboBody'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoboBodyMesh"]);
         this.meshes['RoboHead'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoboHeadMesh"]);
+        this.meshes['spikes'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["spikesMesh"]);
         this.meshes['coin'] = MeshUtils.Sphere(this.gl);
         this.meshes['obstacle'] = MeshUtils.Sphere(this.gl);
-        this.meshes['spike'] = MeshUtils.Sphere(this.gl);
+        //this.meshes['spike'] = MeshUtils.Sphere(this.gl);
         this.meshes['cubeMapMesh'] = MeshUtils.Cube(this.gl);
         
         /*******************************  Initializing all the textures *******************************/
-        
-        this.textures['road'] = this.gl.createTexture();
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures['road']);
-        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 4);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.game.loader.resources['road-texture']);
-        this.gl.generateMipmap(this.gl.TEXTURE_2D);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
-        
-        this.textures['RoboBody'] = this.gl.createTexture();
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures['RoboBody']);
-        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 4);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.game.loader.resources['RoboBody-texture']);
-        this.gl.generateMipmap(this.gl.TEXTURE_2D);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
-        
-        this.textures['RoboHead'] = this.gl.createTexture();
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures['RoboHead']);
-        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 4);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.game.loader.resources['RoboHead-texture']);
-        this.gl.generateMipmap(this.gl.TEXTURE_2D);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+        this.textures['road'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['road-texture']);
+        this.textures['RoboBody'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['RoboBody-texture']);
+        this.textures['RoboHead'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['RoboHead-texture']);
+        this.textures['spikes'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['spikes-texture']);
         
         this.textures['environment'] = this.gl.createTexture();
         this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this.textures['environment']);
@@ -192,7 +170,7 @@ export default class MainGame extends Scene {
         
         this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['coin'], this.scoremanager, this.player);
         this.obstacles = new Obstacles(this.gl, this.obstaclesprogram, this.meshes['obstacle'], this.scoremanager);
-        this.spikes = new Spikes(this.gl, this.spikesprogram, this.meshes['spike'], this.scoremanager, this.player);
+        this.spikes = new Spikes(this.gl, this.spikesprogram, this.meshes['spikes'], this.scoremanager, this.player , this.textures['spikes']);
         
         /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
         
@@ -228,7 +206,7 @@ export default class MainGame extends Scene {
         
         this.road.drawRoad(500 , this.camera.position);      // Draws Infinite Plane With X planes to be repeated
         
-        this.camera.Move(600 , 0.3 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
+        this.camera.Move(600 , 0.05 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
         
         this.player.Draw(VP,this.camera.getposition(), deltaTime);
         
