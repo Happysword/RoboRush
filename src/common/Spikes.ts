@@ -36,6 +36,8 @@ export default class Spikes extends Collider {
         
         this.SpikesProgram.use();
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.SpikesTexture);
+        this.SpikesProgram.setUniform3f('cam_position' , cameraPos);
+        this.SpikesProgram.setUniformMatrix4fv("VP", false, VP);
         this.SpikesProgram.setUniform1i('texture_sampler', 0);
 
         for (var i = 0; i < 500; i += 5)
