@@ -65,7 +65,7 @@ export default class MainGame extends Scene {
             ["RoboHeadMesh"]:{url:'models/RoboHead.obj', type:'text'},
             ["spikesMesh"]:{url:'models/spikes.obj', type:'text'},
             ["wrenchMesh"]:{url:'models/wrenches.obj', type:'text'},
-            ["barrelMesh"]:{url:'models/barrel.obj', type:'text'},
+            ["barrelMesh"]:{url:'models/barrels.obj', type:'text'},
             ["road-texture"]:{url:'images/Three_lane_road.png', type:'image'},
             ["spikes-texture"]:{url:'images/spikes-texture.jpg', type:'image'},
             ["RoboBody-texture"]:{url:'images/BodydiffMAP.jpg', type:'image'},

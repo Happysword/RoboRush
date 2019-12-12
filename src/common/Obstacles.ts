@@ -103,8 +103,8 @@ export default class Obstacles extends Collider {
         // if collided then don't draw
         if (!this.didCollide(lane, distance, playerPos, cameraPos, time))
         {
-            mat4.scale(obstacleMat, obstacleMat , [0.4 , 0.4 , 0.4]);
-            mat4.translate(obstacleMat , obstacleMat , [0,-3.8,0]);
+            mat4.scale(obstacleMat, obstacleMat , [0.8 , 0.8 , 0.8]);
+            mat4.translate(obstacleMat , obstacleMat , [1,-2,0]);
             mat4.rotateY(obstacleMat , obstacleMat , Math.PI/4)
             this.ObstaclesProgram.setUniformMatrix4fv("MVP", false, obstacleMat);
             this.ObstaclesProgram.setUniform4f("tint", [1, 1, 1, 1]);
