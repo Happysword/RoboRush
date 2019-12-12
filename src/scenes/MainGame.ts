@@ -74,9 +74,9 @@ export default class MainGame extends Scene {
             ["spikes-texture"]:{url:'images/spikes-texture.jpg', type:'image'},
             ["RoboBody-texture"]:{url:'images/BodydiffMAP.jpg', type:'image'},
             ["RoboHead-texture"]:{url:'images/HEADdiffMAP.jpg', type:'image'},
-            ["inputFile.txt"]:{url:'inputFile.txt', type:'text'},
             ["wrench-texture"]:{url:'images/wrenches.jpg', type:'image'},
             ["barrel-texture"]:{url:'images/barrel.png', type:'image'},
+            ["inputFile.txt"]:{url:'inputFile.txt', type:'text'},
             ...Object.fromEntries(MainGame.cubemapDirections.map(dir=>[dir, {url:`images/cubemappics/${dir}.jpg`, type:'image'}]))
         });
     } 
@@ -85,7 +85,6 @@ export default class MainGame extends Scene {
         /*******************************  Initializing all the Programs *******************************/
         this.ifm = new inputFileManager(this.game.loader.resources["inputFile.txt"]);
         this.obstaclesArray = this.ifm.getInputsIn2DArr();
-        console.log(this.obstaclesArray[0][1]);
 
         this.roadProgram = new ShaderProgram(this.gl);
         this.roadProgram.attach(this.game.loader.resources["Road.vert"], this.gl.VERTEX_SHADER);
