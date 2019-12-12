@@ -25,7 +25,7 @@ export default class Player {
     roboBodyTexture : WebGLTexture;
     roboHeadTexture : WebGLTexture;
     time: number = 0;
-    maxlanedisp: number = 1.8;
+    maxlanedisp: number = 1.7;
     speedofsliding: number = 0.07;
 
     constructor( Playerbodyprogram : ShaderProgram, playerheadprogram : ShaderProgram , playerbodymesh : Mesh, playerheadmesh : Mesh ,GL : WebGL2RenderingContext, input:Input , bodyTexture : WebGLTexture , headtexture : WebGLTexture)
@@ -60,7 +60,7 @@ export default class Player {
         this.MovePlayerJump(this.time);
         
         
-        mat4.scale(this.PlayerBodyMat,this.PlayerBodyMat,[0.5,0.5,0.5])
+        mat4.scale(this.PlayerBodyMat,this.PlayerBodyMat,[0.4,0.4,0.4])
         mat4.rotateX(this.PlayerBodyMat , this.PlayerBodyMat , this.time * 9);
         this.PlayerBodyProgram.setUniformMatrix4fv("VP", false, VP);
         this.PlayerBodyProgram.setUniform3f('cam_position' , camerapos);
@@ -82,7 +82,7 @@ export default class Player {
         this.MovePlayerHeadJump(this.time);
 
         
-        mat4.scale(this.PlayerHeadMat,this.PlayerHeadMat,[0.5,0.5,0.5])
+        mat4.scale(this.PlayerHeadMat,this.PlayerHeadMat,[0.4,0.4,0.4])
         mat4.rotateY(this.PlayerHeadMat , this.PlayerHeadMat , Math.cos( this.time * 0.7  ) * Math.sin( this.time * 2  )* 4);
         mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0.25,-1.3,0]);
         this.PlayerHeadProgram.setUniformMatrix4fv("VP", false, VP);
@@ -119,7 +119,7 @@ export default class Player {
 
     private MovePlayerJump(timenow : number)
     {
-        mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,-2.3,0])
+        mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,-2.1,0])
         
         if(this.isjumping == true)
         {
@@ -139,7 +139,7 @@ export default class Player {
 
     private MovePlayerHeadJump(timenow : number)
     {
-        mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,-2.3,0])
+        mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,-2.1,0])
         
         if(this.isjumping == true)
         {
