@@ -48,10 +48,10 @@ export default class MainGame extends Scene {
         this.game.loader.load({
             ["spikes.vert"]:{url:'shaders/spikes.vert', type:'text'},
             ["spikes.frag"]:{url:'shaders/spikes.frag', type:'text'},
-            ["BlueColor.vert"]:{url:'shaders/BlueColor.vert', type:'text'},
-            ["BlueColor.frag"]:{url:'shaders/BlueColor.frag', type:'text'},
-            ["GreenColor.vert"]:{url:'shaders/GreenColor.vert', type:'text'},
-            ["GreenColor.frag"]:{url:'shaders/GreenColor.frag', type:'text'},
+            ["wrench.vert"]:{url:'shaders/wrench.vert', type:'text'},
+            ["wrench.frag"]:{url:'shaders/wrench.frag', type:'text'},
+            ["barrel.vert"]:{url:'shaders/barrel.vert', type:'text'},
+            ["barrel.frag"]:{url:'shaders/barrel.frag', type:'text'},
             ["RoboBody.vert"]:{url:'shaders/RoboBody.vert', type:'text'},
             ["RoboBody.frag"]:{url:'shaders/RoboBody.frag', type:'text'},
             ["RoboHead.vert"]:{url:'shaders/RoboHead.vert', type:'text'},
@@ -64,10 +64,14 @@ export default class MainGame extends Scene {
             ["RoboBodyMesh"]:{url:'models/RoboBody.obj', type:'text'},
             ["RoboHeadMesh"]:{url:'models/RoboHead.obj', type:'text'},
             ["spikesMesh"]:{url:'models/spikes.obj', type:'text'},
+            ["wrenchMesh"]:{url:'models/wrenches.obj', type:'text'},
+            ["barrelMesh"]:{url:'models/barrel.obj', type:'text'},
             ["road-texture"]:{url:'images/Three_lane_road.png', type:'image'},
             ["spikes-texture"]:{url:'images/spikes-texture.jpg', type:'image'},
             ["RoboBody-texture"]:{url:'images/BodydiffMAP.jpg', type:'image'},
             ["RoboHead-texture"]:{url:'images/HEADdiffMAP.jpg', type:'image'},
+            ["wrench-texture"]:{url:'images/wrenches.jpg', type:'image'},
+            ["barrel-texture"]:{url:'images/barrel.png', type:'image'},
             ...Object.fromEntries(MainGame.cubemapDirections.map(dir=>[dir, {url:`images/cubemappics/${dir}.jpg`, type:'image'}]))
         });
     } 
@@ -91,13 +95,13 @@ export default class MainGame extends Scene {
         this.playerHeadprogram.link();
 
         this.coinsprogram = new ShaderProgram(this.gl);
-        this.coinsprogram.attach(this.game.loader.resources["BlueColor.vert"], this.gl.VERTEX_SHADER);
-        this.coinsprogram.attach(this.game.loader.resources["BlueColor.frag"], this.gl.FRAGMENT_SHADER);
+        this.coinsprogram.attach(this.game.loader.resources["wrench.vert"], this.gl.VERTEX_SHADER);
+        this.coinsprogram.attach(this.game.loader.resources["wrench.frag"], this.gl.FRAGMENT_SHADER);
         this.coinsprogram.link();
 
         this.obstaclesprogram = new ShaderProgram(this.gl);
-        this.obstaclesprogram.attach(this.game.loader.resources["GreenColor.vert"], this.gl.VERTEX_SHADER);
-        this.obstaclesprogram.attach(this.game.loader.resources["GreenColor.frag"], this.gl.FRAGMENT_SHADER);
+        this.obstaclesprogram.attach(this.game.loader.resources["barrel.vert"], this.gl.VERTEX_SHADER);
+        this.obstaclesprogram.attach(this.game.loader.resources["barrel.frag"], this.gl.FRAGMENT_SHADER);
         this.obstaclesprogram.link();
 
         this.spikesprogram = new ShaderProgram(this.gl);
@@ -128,9 +132,10 @@ export default class MainGame extends Scene {
         this.meshes['RoboBody'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoboBodyMesh"]);
         this.meshes['RoboHead'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoboHeadMesh"]);
         this.meshes['spikes'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["spikesMesh"]);
+        this.meshes['wrench'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["wrenchMesh"]);
+        this.meshes['barrel'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["barrelMesh"]);
         this.meshes['coin'] = MeshUtils.Sphere(this.gl);
         this.meshes['obstacle'] = MeshUtils.Sphere(this.gl);
-        //this.meshes['spike'] = MeshUtils.Sphere(this.gl);
         this.meshes['cubeMapMesh'] = MeshUtils.Cube(this.gl);
         
         /*******************************  Initializing all the textures *******************************/
@@ -138,6 +143,8 @@ export default class MainGame extends Scene {
         this.textures['RoboBody'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['RoboBody-texture']);
         this.textures['RoboHead'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['RoboHead-texture']);
         this.textures['spikes'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['spikes-texture']);
+        this.textures['wrench'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['wrench-texture']);
+        this.textures['barrel'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['barrel-texture']);
         
         this.textures['environment'] = this.gl.createTexture();
         this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this.textures['environment']);
@@ -168,8 +175,8 @@ export default class MainGame extends Scene {
         // Just loading any positions for coins now but later should be loaded from file ?
         // for now just put coins everywhere
         
-        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['coin'], this.scoremanager, this.player);
-        this.obstacles = new Obstacles(this.gl, this.obstaclesprogram, this.meshes['obstacle'], this.scoremanager);
+        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['wrench'], this.scoremanager, this.player , this.textures['wrench']);
+        this.obstacles = new Obstacles(this.gl, this.obstaclesprogram, this.meshes['barrel'], this.scoremanager , this.textures['barrel']);
         this.spikes = new Spikes(this.gl, this.spikesprogram, this.meshes['spikes'], this.scoremanager, this.player , this.textures['spikes']);
         
         /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
@@ -206,7 +213,7 @@ export default class MainGame extends Scene {
         
         this.road.drawRoad(500 , this.camera.position);      // Draws Infinite Plane With X planes to be repeated
         
-        this.camera.Move(600 , 0.05 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
+        this.camera.Move(600 , 0.1 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
         
         this.player.Draw(VP,this.camera.getposition(), deltaTime);
         

@@ -17,7 +17,7 @@ export default class Coins extends Collider {
     previousHitsTime : number[];
     scoremanager : ScoreManager;
     
-    public constructor (GL : WebGL2RenderingContext, coinsprogram : ShaderProgram, coinsmesh : Mesh, scoresManager : ScoreManager, playerinst : Player)
+    public constructor (GL : WebGL2RenderingContext, coinsprogram : ShaderProgram, coinsmesh : Mesh, scoresManager : ScoreManager, playerinst : Player , wrenchTexture : WebGLTexture)
     {
         super(GL);
         this.CoinsProgram = coinsprogram;
@@ -27,11 +27,18 @@ export default class Coins extends Collider {
         this.previousHitsTime = new Array<number>();
         this.scoremanager = scoresManager;
         this.player = playerinst;
+        this.CoinsTexture = wrenchTexture;
     }
-
+    
     public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number)
     {
         this.coinsMat = mat4.clone(VP);
+        
+        this.CoinsProgram.use();
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.CoinsTexture);
+        this.CoinsProgram.setUniform1i('texture_sampler', 0);
+        this.CoinsProgram.setUniform3f('cam_position' , cameraPos);
+        this.CoinsProgram.setUniformMatrix4fv("VP", false, VP);
         // Draw all coins here should put (Lane of Coin, distance of coin, leave the rest as is)
         // Lane of Coin 0=>left lane, 1=>middle lane, 2=>right lane 
         for (var i = 0; i < 500; i += 5)
@@ -39,7 +46,7 @@ export default class Coins extends Collider {
             this.drawCoin(1, i, playerPos, cameraPos, time);
         }
     }
-
+    
     public didCollide(coinLane : number, coinDistance : number, playerPos : number, cameraPos : vec3, time : number) : boolean
     {
         // First check if object collided with player before
@@ -102,9 +109,10 @@ export default class Coins extends Collider {
         // if collided then don't draw
         if (!this.didCollide(lane, distance, playerPos, cameraPos, time))
         {
-            this.CoinsProgram.use();
+            mat4.rotateY(coinMat , coinMat , time * 2.5);
+            mat4.scale(coinMat , coinMat , [0.8,0.8,0.8])
             this.CoinsProgram.setUniformMatrix4fv("MVP", false, coinMat);
-            this.CoinsProgram.setUniform4f("tint", [1, 1, 1, 1]);
+            this.CoinsProgram.setUniform4f("tint", [((Math.abs(Math.sin(time*2))+0.5)/2)+0.5, 1, ((Math.abs(Math.sin(time*2))+0.5)/2)+0.5, 1]);
             this.CoinsMesh.draw(this.gl.TRIANGLES);
         }
     }
