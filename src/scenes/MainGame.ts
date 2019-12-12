@@ -84,7 +84,8 @@ export default class MainGame extends Scene {
     public start(): void {
         /*******************************  Initializing all the Programs *******************************/
         this.ifm = new inputFileManager(this.game.loader.resources["inputFile.txt"]);
-        this.obstaclesArray = this.ifm.getInputsIn2DArr();
+        this.obstaclesArray = this.ifm.getArray();
+        
 
         this.roadProgram = new ShaderProgram(this.gl);
         this.roadProgram.attach(this.game.loader.resources["Road.vert"], this.gl.VERTEX_SHADER);

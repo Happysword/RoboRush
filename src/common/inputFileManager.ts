@@ -5,9 +5,9 @@ export default  class InputFileManager {
     {
         this.fileString = fs;
         this.collisionObjects = new Array();
-        this.getInputsIn2DArr();
+        this.load2DArray();
     }
-    public getInputsIn2DArr():number[][]
+    private load2DArray()
     {
         let rowsArr  = this.fileString.split("\n");              /*Splits the file string into array of strings. Each string contains a row*/
         let row_counter = 0;
@@ -23,13 +23,24 @@ export default  class InputFileManager {
             })
             row_counter++;
         });
+    }
+
+    public getArray():number[][]
+    {
         return this.collisionObjects;
     }
 
-    public getFileString():string{
-        return this.fileString;
+    public shuffleArray()
+    {
+        var array = this.collisionObjects;
+        for (var i = array.length - 1; i > 0; i--) 
+				{
+					var j = Math.floor(Math.random() * (i + 1));
+					var temp = array[i];
+					array[i] = array[j];
+					array[j] = temp;
+				}
     }
-
     // public getObstaclesType1(): number[]
     // {
     //     let ObstaclesType1 = [];
