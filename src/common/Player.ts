@@ -56,6 +56,11 @@ export default class Player {
         this.MovePlayerDirection();
         this.setPlayerJump(this.time);
         this.MovePlayerJump(this.time);
+        
+        /**Uncomment the next two lines to actually make player on the ground */
+        //mat4.scale(this.PlayerBodyMat,this.PlayerBodyMat,[2,2,2]);
+        //mat4.translate(this.PlayerBodyMat, this.PlayerBodyMat , [0,-0.5,0.5]);
+        
         mat4.scale(this.PlayerBodyMat,this.PlayerBodyMat,[0.2,0.2,0.2])
         mat4.rotateX(this.PlayerBodyMat , this.PlayerBodyMat , this.time * 9);
         this.PlayerBodyProgram.setUniformMatrix4fv("VP", false, VP);
@@ -77,6 +82,10 @@ export default class Player {
         this.MovePlayerHeadDirection();
         this.MovePlayerHeadJump(this.time);
 
+        /**Uncomment the next two lines to actually make player on the ground */
+        //mat4.scale(this.PlayerHeadMat,this.PlayerHeadMat,[2,2,2]);
+        //mat4.translate(this.PlayerHeadMat, this.PlayerHeadMat , [0,-0.5,0.5]);
+        
         mat4.scale(this.PlayerHeadMat,this.PlayerHeadMat,[0.2,0.2,0.2])
         mat4.rotateY(this.PlayerHeadMat , this.PlayerHeadMat , Math.cos( this.time * 0.7  ) * Math.sin( this.time * 2  )* 4);
         mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0.25,-1.3,0]);

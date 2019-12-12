@@ -112,7 +112,7 @@ export default class Coins extends Collider {
             mat4.rotateY(coinMat , coinMat , time * 2.5);
             mat4.scale(coinMat , coinMat , [0.8,0.8,0.8])
             this.CoinsProgram.setUniformMatrix4fv("MVP", false, coinMat);
-            this.CoinsProgram.setUniform4f("tint", [((Math.abs(Math.sin(time*2))+0.5)/2)+0.5, 1, ((Math.abs(Math.sin(time*2))+0.5)/2)+0.5, 1]);
+            this.CoinsProgram.setUniform4f("tint", [((Math.abs(Math.cos(time*2)*Math.sin(time*2))+0.5)/2)+0.5, 1, ((Math.abs(Math.cos(time*2)*Math.sin(time*2))+0.5)/2)+0.5, 1]);
             this.CoinsMesh.draw(this.gl.TRIANGLES);
         }
     }
