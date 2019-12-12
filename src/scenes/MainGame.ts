@@ -2,6 +2,7 @@ import { Scene } from '../common/game';
 import ShaderProgram from '../common/shader-program';
 import Mesh from '../common/mesh';
 import * as MeshUtils from '../common/mesh-utils';
+import * as TextureUtils from '../common/texture-utils';
 import Camera from '../common/camera';
 import FlyCameraController from '../common/camera-controllers/fly-camera-controller';
 import { vec2, vec3, mat4 } from 'gl-matrix';
@@ -12,6 +13,7 @@ import Input from '../common/input';
 import Player from '../common/Player';
 import Coins from '../common/Coins';
 import Obstacles from '../common/Obstacles';
+import Spikes from '../common/Spikes';
 import ScoreManager from '../common/ScoreManager';
 import SkyBox from '../common/SkyBox';
 import inputFileManager from '../common/inputFileManager';
@@ -23,6 +25,7 @@ export default class MainGame extends Scene {
     playerHeadprogram: ShaderProgram;
     coinsprogram: ShaderProgram;
     obstaclesprogram : ShaderProgram;
+    spikesprogram : ShaderProgram;
     skyBoxProgram : ShaderProgram;
     samplerCubeMap: WebGLSampler;
     time: number = 0;
@@ -35,7 +38,8 @@ export default class MainGame extends Scene {
     roadMat : mat4;
     road : Road;
     coins : Coins; 
-    obstacles : Obstacles;  
+    obstacles : Obstacles;
+    spikes : Spikes;  
     scoremanager : ScoreManager;   
     skyBox : SkyBox;
     ifm : inputFileManager;
@@ -46,12 +50,12 @@ export default class MainGame extends Scene {
 
     public load(): void {
         this.game.loader.load({
-            ["RedColor.vert"]:{url:'shaders/RedColor.vert', type:'text'},
-            ["RedColor.frag"]:{url:'shaders/RedColor.frag', type:'text'},
-            ["BlueColor.vert"]:{url:'shaders/BlueColor.vert', type:'text'},
-            ["BlueColor.frag"]:{url:'shaders/BlueColor.frag', type:'text'},
-            ["GreenColor.vert"]:{url:'shaders/GreenColor.vert', type:'text'},
-            ["GreenColor.frag"]:{url:'shaders/GreenColor.frag', type:'text'},
+            ["spikes.vert"]:{url:'shaders/spikes.vert', type:'text'},
+            ["spikes.frag"]:{url:'shaders/spikes.frag', type:'text'},
+            ["wrench.vert"]:{url:'shaders/wrench.vert', type:'text'},
+            ["wrench.frag"]:{url:'shaders/wrench.frag', type:'text'},
+            ["barrel.vert"]:{url:'shaders/barrel.vert', type:'text'},
+            ["barrel.frag"]:{url:'shaders/barrel.frag', type:'text'},
             ["RoboBody.vert"]:{url:'shaders/RoboBody.vert', type:'text'},
             ["RoboBody.frag"]:{url:'shaders/RoboBody.frag', type:'text'},
             ["RoboHead.vert"]:{url:'shaders/RoboHead.vert', type:'text'},
@@ -63,10 +67,16 @@ export default class MainGame extends Scene {
             ["RoadPlane"]:{url:'models/RoadPlane.obj', type:'text'},
             ["RoboBodyMesh"]:{url:'models/RoboBody.obj', type:'text'},
             ["RoboHeadMesh"]:{url:'models/RoboHead.obj', type:'text'},
+            ["spikesMesh"]:{url:'models/spikes.obj', type:'text'},
+            ["wrenchMesh"]:{url:'models/wrenches.obj', type:'text'},
+            ["barrelMesh"]:{url:'models/barrels.obj', type:'text'},
             ["road-texture"]:{url:'images/Three_lane_road.png', type:'image'},
+            ["spikes-texture"]:{url:'images/spikes-texture.jpg', type:'image'},
             ["RoboBody-texture"]:{url:'images/BodydiffMAP.jpg', type:'image'},
             ["RoboHead-texture"]:{url:'images/HEADdiffMAP.jpg', type:'image'},
             ["inputFile.txt"]:{url:'inputFile.txt', type:'text'},
+            ["wrench-texture"]:{url:'images/wrenches.jpg', type:'image'},
+            ["barrel-texture"]:{url:'images/barrel.png', type:'image'},
             ...Object.fromEntries(MainGame.cubemapDirections.map(dir=>[dir, {url:`images/cubemappics/${dir}.jpg`, type:'image'}]))
         });
     } 
@@ -93,14 +103,19 @@ export default class MainGame extends Scene {
         this.playerHeadprogram.link();
 
         this.coinsprogram = new ShaderProgram(this.gl);
-        this.coinsprogram.attach(this.game.loader.resources["BlueColor.vert"], this.gl.VERTEX_SHADER);
-        this.coinsprogram.attach(this.game.loader.resources["BlueColor.frag"], this.gl.FRAGMENT_SHADER);
+        this.coinsprogram.attach(this.game.loader.resources["wrench.vert"], this.gl.VERTEX_SHADER);
+        this.coinsprogram.attach(this.game.loader.resources["wrench.frag"], this.gl.FRAGMENT_SHADER);
         this.coinsprogram.link();
 
         this.obstaclesprogram = new ShaderProgram(this.gl);
-        this.obstaclesprogram.attach(this.game.loader.resources["GreenColor.vert"], this.gl.VERTEX_SHADER);
-        this.obstaclesprogram.attach(this.game.loader.resources["GreenColor.frag"], this.gl.FRAGMENT_SHADER);
+        this.obstaclesprogram.attach(this.game.loader.resources["barrel.vert"], this.gl.VERTEX_SHADER);
+        this.obstaclesprogram.attach(this.game.loader.resources["barrel.frag"], this.gl.FRAGMENT_SHADER);
         this.obstaclesprogram.link();
+
+        this.spikesprogram = new ShaderProgram(this.gl);
+        this.spikesprogram.attach(this.game.loader.resources["spikes.vert"], this.gl.VERTEX_SHADER);
+        this.spikesprogram.attach(this.game.loader.resources["spikes.frag"], this.gl.FRAGMENT_SHADER);
+        this.spikesprogram.link();
 
         this.skyBoxProgram = new ShaderProgram(this.gl);
         this.skyBoxProgram.attach(this.game.loader.resources["skybox.vert"], this.gl.VERTEX_SHADER);
@@ -124,41 +139,20 @@ export default class MainGame extends Scene {
         this.meshes['road'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoadPlane"]);
         this.meshes['RoboBody'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoboBodyMesh"]);
         this.meshes['RoboHead'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["RoboHeadMesh"]);
+        this.meshes['spikes'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["spikesMesh"]);
+        this.meshes['wrench'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["wrenchMesh"]);
+        this.meshes['barrel'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["barrelMesh"]);
         this.meshes['coin'] = MeshUtils.Sphere(this.gl);
         this.meshes['obstacle'] = MeshUtils.Sphere(this.gl);
         this.meshes['cubeMapMesh'] = MeshUtils.Cube(this.gl);
         
         /*******************************  Initializing all the textures *******************************/
-        
-        this.textures['road'] = this.gl.createTexture();
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures['road']);
-        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 4);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.game.loader.resources['road-texture']);
-        this.gl.generateMipmap(this.gl.TEXTURE_2D);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
-        
-        this.textures['RoboBody'] = this.gl.createTexture();
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures['RoboBody']);
-        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 4);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.game.loader.resources['RoboBody-texture']);
-        this.gl.generateMipmap(this.gl.TEXTURE_2D);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
-        
-        this.textures['RoboHead'] = this.gl.createTexture();
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures['RoboHead']);
-        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 4);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.game.loader.resources['RoboHead-texture']);
-        this.gl.generateMipmap(this.gl.TEXTURE_2D);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+        this.textures['road'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['road-texture']);
+        this.textures['RoboBody'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['RoboBody-texture']);
+        this.textures['RoboHead'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['RoboHead-texture']);
+        this.textures['spikes'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['spikes-texture']);
+        this.textures['wrench'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['wrench-texture']);
+        this.textures['barrel'] = TextureUtils.LoadImage(this.gl, this.game.loader.resources['barrel-texture']);
         
         this.textures['environment'] = this.gl.createTexture();
         this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this.textures['environment']);
@@ -189,8 +183,9 @@ export default class MainGame extends Scene {
         // Just loading any positions for coins now but later should be loaded from file ?
         // for now just put coins everywhere
         
-        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['coin'], this.scoremanager);
-        this.obstacles = new Obstacles(this.gl, this.obstaclesprogram, this.meshes['obstacle'], this.scoremanager);
+        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['wrench'], this.scoremanager, this.player , this.textures['wrench']);
+        this.obstacles = new Obstacles(this.gl, this.obstaclesprogram, this.meshes['barrel'], this.scoremanager , this.textures['barrel']);
+        this.spikes = new Spikes(this.gl, this.spikesprogram, this.meshes['spikes'], this.scoremanager, this.player , this.textures['spikes']);
         
         /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
         
@@ -224,17 +219,18 @@ export default class MainGame extends Scene {
         
         this.road = new Road(VP , this.roadProgram ,  this.textures['road'] ,this.meshes['road'] , this.gl , deltaTime );
         
-        this.road.drawRoad(500);      // Draws Infinite Plane With X planes to be repeated
+        this.road.drawRoad(500 , this.camera.position);      // Draws Infinite Plane With X planes to be repeated
         
-        this.camera.Move(600 , 0.3 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
+        this.camera.Move(600 , 0.1 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
         
         this.player.Draw(VP,this.camera.getposition(), deltaTime);
         
         this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
         this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
-        
+        this.spikes.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
+
         // Here should draw score ? NO not here but DOLA will do it by html and css
-        
+
         }
     
     public end(): void {

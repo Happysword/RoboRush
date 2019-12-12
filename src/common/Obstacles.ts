@@ -15,7 +15,7 @@ export default class Obstacles extends Collider {
     previousHitsTime : number[];
     scoremanager : ScoreManager;
     
-    public constructor (GL : WebGL2RenderingContext, obstaclesprogram : ShaderProgram, obstaclesmesh : Mesh, scoresManager : ScoreManager)
+    public constructor (GL : WebGL2RenderingContext, obstaclesprogram : ShaderProgram, obstaclesmesh : Mesh, scoresManager : ScoreManager, barrelTexture : WebGLTexture)
     {
         super(GL);
         this.ObstaclesProgram = obstaclesprogram;
@@ -24,17 +24,23 @@ export default class Obstacles extends Collider {
         this.previousHitsDistance = new Array<number>();
         this.previousHitsTime = new Array<number>();
         this.scoremanager = scoresManager;
+        this.ObstaclesTexture = barrelTexture;
     }
-
+    
     public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number)
     {
         this.obstaclesMat = mat4.clone(VP);
+        
+        this.ObstaclesProgram.use();
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.ObstaclesTexture);
+        this.ObstaclesProgram.setUniform1i('texture_sampler', 0);
+        this.ObstaclesProgram.setUniform3f('cam_position' , cameraPos);
+        this.ObstaclesProgram.setUniformMatrix4fv("VP", false, VP);
 
         for (var i = 0; i < 500; i += 5)
         {
             // Draw all obstacles here should put (Lane of obstacle, distance of obstacle, leave the rest as is)
             // Lane of obstacle 0=>left lane, 1=>middle lane, 2=>right lane 
-            this.drawObstacle(0, i, playerPos, cameraPos, time);
             this.drawObstacle(2, i, playerPos, cameraPos, time);
         }
     }
@@ -97,7 +103,9 @@ export default class Obstacles extends Collider {
         // if collided then don't draw
         if (!this.didCollide(lane, distance, playerPos, cameraPos, time))
         {
-            this.ObstaclesProgram.use();
+            mat4.scale(obstacleMat, obstacleMat , [0.8 , 0.8 , 0.8]);
+            mat4.translate(obstacleMat , obstacleMat , [1,-2,0]);
+            mat4.rotateY(obstacleMat , obstacleMat , Math.PI/4)
             this.ObstaclesProgram.setUniformMatrix4fv("MVP", false, obstacleMat);
             this.ObstaclesProgram.setUniform4f("tint", [1, 1, 1, 1]);
             this.ObstaclesMesh.draw(this.gl.TRIANGLES);

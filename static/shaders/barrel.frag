@@ -27,13 +27,13 @@ uniform vec4 tint;
 uniform sampler2D texture_sampler;
 uniform vec3 cam_position;
 
-vec3 lightAmbient = vec3(0.8,0.8,0.8);
+vec3 lightAmbient = vec3(0.6,0.6,0.6);
 vec3 lightDirection = vec3(-0.4,-0.8,0.5);
-vec3 lightDiffuse = vec3(0.1,0.1,0.1);
-vec3 lightSpecular = vec3(0.0,0.0,0.0);
+vec3 lightDiffuse = vec3(0.2,0.2,0.2);
+vec3 lightSpecular = vec3(1.0,1.0,1.0);
 
 vec3 materialDiffuse = vec3(0.0,0.0,0.0);
-float materialShiniess = 0.0*2.0;
+float materialShiniess = 64.0*1.0;
 vec3 materialSpecular = vec3(0.0,0.0,0.0);
 
 void main(){
@@ -55,5 +55,5 @@ void main(){
     vec3 specular = lightSpecular * spec;  
 
     vec3 result = ambient + diffuse + specular;
-    color = vec4(result, 1.0);
+    color = vec4(result, 1.0) * tint;
 }

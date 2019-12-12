@@ -5,6 +5,7 @@ import Mesh from '../common/mesh';
 export default class Road {
 
     roadMat : mat4;
+    vp :mat4;
     roadProgram : ShaderProgram;
     gl : WebGL2RenderingContext;
     roadTexture : WebGLTexture;
@@ -22,10 +23,11 @@ export default class Road {
         this.roadMesh = RoadMesh;
         this.gl = GL;
         this.deltaTime = DeltaTime;
+        this.vp = VP;
     }
 
 
-    public drawRoad(numOfPlanes : number)
+    public drawRoad(numOfPlanes : number , cameraPos : vec3)
     {
         //************  Here we draw 5 planes as a start  ************//
 
@@ -33,6 +35,8 @@ export default class Road {
 
         // Start of first plane //
         this.roadProgram.setUniformMatrix4fv("MVP", false, this.roadMat);
+        this.roadProgram.setUniformMatrix4fv("VP", false, this.vp);
+        this.roadProgram.setUniform3f('cam_position' , cameraPos);
         this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
 
         //this.gl.activeTexture(this.gl.TEXTURE0);
@@ -45,6 +49,8 @@ export default class Road {
         mat4.translate(this.roadMat , this.roadMat , [2,0,0]);                     // increment x by 2 (distance between 2 planes)
 
         this.roadProgram.setUniformMatrix4fv("MVP", false, this.roadMat);
+        this.roadProgram.setUniformMatrix4fv("VP", false, this.vp);
+        this.roadProgram.setUniform3f('cam_position' , cameraPos);
         this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
 
         //this.gl.activeTexture(this.gl.TEXTURE0);
@@ -57,6 +63,8 @@ export default class Road {
         mat4.translate(this.roadMat , this.roadMat , [2,0,0]);                     // increment x by 2 (distance between 2 planes)
 
         this.roadProgram.setUniformMatrix4fv("MVP", false, this.roadMat);
+        this.roadProgram.setUniformMatrix4fv("VP", false, this.vp);
+        this.roadProgram.setUniform3f('cam_position' , cameraPos);
         this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
 
         //this.gl.activeTexture(this.gl.TEXTURE0);
@@ -69,6 +77,8 @@ export default class Road {
         mat4.translate(this.roadMat , this.roadMat , [2,0,0]);                     // increment x by 2 (distance between 2 planes)
 
         this.roadProgram.setUniformMatrix4fv("MVP", false, this.roadMat);
+        this.roadProgram.setUniformMatrix4fv("VP", false, this.vp);
+        this.roadProgram.setUniform3f('cam_position' , cameraPos);
         this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
 
         //this.gl.activeTexture(this.gl.TEXTURE0);
@@ -81,6 +91,8 @@ export default class Road {
         mat4.translate(this.roadMat , this.roadMat , [2,0,0]);                     // increment x by 2 (distance between 2 planes)
 
         this.roadProgram.setUniformMatrix4fv("MVP", false, this.roadMat);
+        this.roadProgram.setUniformMatrix4fv("VP", false, this.vp);
+        this.roadProgram.setUniform3f('cam_position' , cameraPos);
         this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
 
         //this.gl.activeTexture(this.gl.TEXTURE0);
@@ -89,11 +101,11 @@ export default class Road {
 
         this.roadMesh.draw(this.gl.TRIANGLES);
 
-        this.DrawRoadAfterTime(this.roadMat , numOfPlanes);
+        this.DrawRoadAfterTime(this.roadMat , numOfPlanes , cameraPos);
 
     }
 
-    public DrawRoadAfterTime(roadMat :mat4 , numOfPlanes : number)
+    public DrawRoadAfterTime(roadMat :mat4 , numOfPlanes : number ,cameraPos : vec3 )
     {
 
         for(let i = 0 ; i < numOfPlanes ; i++)
@@ -101,6 +113,8 @@ export default class Road {
             mat4.translate(roadMat , roadMat , [2,0,0]);                     // increment x by 2 (distance between 2 planes)
                 
             this.roadProgram.setUniformMatrix4fv("MVP", false, roadMat);
+            this.roadProgram.setUniformMatrix4fv("VP", false, this.vp);
+          this.roadProgram.setUniform3f('cam_position' , cameraPos);
             this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
                 
             //this.gl.activeTexture(this.gl.TEXTURE0);

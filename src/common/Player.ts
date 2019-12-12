@@ -2,6 +2,7 @@ import { vec3, mat4 } from 'gl-matrix';
 import ShaderProgram from './shader-program';
 import Mesh from '../common/mesh';
 import Input from '../common/input';
+import Camera from './camera';
 
 export default class Player {
 
@@ -57,6 +58,8 @@ export default class Player {
         this.MovePlayerJump(this.time);
         mat4.scale(this.PlayerBodyMat,this.PlayerBodyMat,[0.2,0.2,0.2])
         mat4.rotateX(this.PlayerBodyMat , this.PlayerBodyMat , this.time * 9);
+        this.PlayerBodyProgram.setUniformMatrix4fv("VP", false, VP);
+        this.PlayerBodyProgram.setUniform3f('cam_position' , camerapos);
         this.PlayerBodyProgram.setUniformMatrix4fv("MVP", false, this.PlayerBodyMat);
         this.PlayerBodyProgram.setUniform4f("tint", [1, 1, 1, 1]);
         this.PlayerBodyMesh.draw(this.gl.TRIANGLES);
@@ -77,7 +80,9 @@ export default class Player {
         mat4.scale(this.PlayerHeadMat,this.PlayerHeadMat,[0.2,0.2,0.2])
         mat4.rotateY(this.PlayerHeadMat , this.PlayerHeadMat , Math.cos( this.time * 0.7  ) * Math.sin( this.time * 2  )* 4);
         mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0.25,-1.3,0]);
+        this.PlayerHeadProgram.setUniformMatrix4fv("VP", false, VP);
         this.PlayerHeadProgram.setUniformMatrix4fv("MVP", false, this.PlayerHeadMat);
+        this.PlayerHeadProgram.setUniform3f('cam_position' , camerapos);
         this.PlayerHeadProgram.setUniform4f("tint", [1, 1, 1, 1]);
         this.PlayerHeadMesh.draw(this.gl.TRIANGLES);
 
@@ -86,11 +91,11 @@ export default class Player {
     private setPlayerDirection()
     {
 
-        if(this.playerdirection == 0 && this.inputer.isKeyJustDown("ArrowLeft"))
+        if(this.playerdirection == 0 && (this.inputer.isKeyJustDown("ArrowLeft")) )
        {   
             this.playerdirection = 1;
        }
-       else if(this.playerdirection == 0 && this.inputer.isKeyJustDown("ArrowRight"))
+       else if(this.playerdirection == 0 && (this.inputer.isKeyJustDown("ArrowRight")) 
        {
             this.playerdirection = 2;
        }

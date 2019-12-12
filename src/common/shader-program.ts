@@ -190,4 +190,12 @@ export default class ShaderProgram {
     public setUniformMatrix4x3fv(name: string, transpose: boolean, data: Float32Array | ArrayLike<number>, srcOffset?: number, srcLength?: number){
         this.gl.uniformMatrix4x3fv(this.gl.getUniformLocation(this.program, name), transpose, data, srcOffset, srcLength);
     }
+
+    public setTexture(name: string, unit: number, target: number, texture: WebGLTexture, sampler?: WebGLSampler){
+        this.gl.activeTexture(unit + this.gl.TEXTURE0);
+        this.gl.bindTexture(target, texture);
+        if(sampler) this.gl.bindSampler(unit, sampler);
+        else this.gl.bindSampler(unit, null);
+        this.setUniform1i(name, unit);
+    }
 }
