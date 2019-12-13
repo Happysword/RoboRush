@@ -25,6 +25,8 @@ export default class Player {
     roboBodyTexture : WebGLTexture;
     roboHeadTexture : WebGLTexture;
     time: number = 0;
+    maxlanedisp: number = 1.7;
+    speedofsliding: number = 0.07;
 
     constructor( Playerbodyprogram : ShaderProgram, playerheadprogram : ShaderProgram , playerbodymesh : Mesh, playerheadmesh : Mesh ,GL : WebGL2RenderingContext, input:Input , bodyTexture : WebGLTexture , headtexture : WebGLTexture)
     {
@@ -56,7 +58,9 @@ export default class Player {
         this.MovePlayerDirection();
         this.setPlayerJump(this.time);
         this.MovePlayerJump(this.time);
-        mat4.scale(this.PlayerBodyMat,this.PlayerBodyMat,[0.2,0.2,0.2])
+        
+        
+        mat4.scale(this.PlayerBodyMat,this.PlayerBodyMat,[0.4,0.4,0.4])
         mat4.rotateX(this.PlayerBodyMat , this.PlayerBodyMat , this.time * 9);
         this.PlayerBodyProgram.setUniformMatrix4fv("VP", false, VP);
         this.PlayerBodyProgram.setUniform3f('cam_position' , camerapos);
@@ -77,7 +81,8 @@ export default class Player {
         this.MovePlayerHeadDirection();
         this.MovePlayerHeadJump(this.time);
 
-        mat4.scale(this.PlayerHeadMat,this.PlayerHeadMat,[0.2,0.2,0.2])
+        
+        mat4.scale(this.PlayerHeadMat,this.PlayerHeadMat,[0.4,0.4,0.4])
         mat4.rotateY(this.PlayerHeadMat , this.PlayerHeadMat , Math.cos( this.time * 0.7  ) * Math.sin( this.time * 2  )* 4);
         mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0.25,-1.3,0]);
         this.PlayerHeadProgram.setUniformMatrix4fv("VP", false, VP);
@@ -95,7 +100,7 @@ export default class Player {
        {   
             this.playerdirection = 1;
        }
-       else if(this.playerdirection == 0 && (this.inputer.isKeyJustDown("ArrowRight")) 
+       else if(this.playerdirection == 0 && (this.inputer.isKeyJustDown("ArrowRight")) )
        {
             this.playerdirection = 2;
        }
@@ -114,16 +119,16 @@ export default class Player {
 
     private MovePlayerJump(timenow : number)
     {
-        mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,-1,0])
+        mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,-2.1,0])
         
         if(this.isjumping == true)
         {
-            let jumpduration = 0.5;
+            let jumpduration = 0.4;
             let timepassed = timenow - this.timeofjumppress;
             let jumpdisplacement = Math.PI/2*(timepassed / jumpduration);
 
             if(timepassed < 2*jumpduration)
-            { mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,  0.5 * Math.sin(jumpdisplacement) ,0]) }
+            { mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,  1.0 * Math.sin(jumpdisplacement) ,0]) }
             
             else 
             { this.isjumping = false }
@@ -134,17 +139,17 @@ export default class Player {
 
     private MovePlayerHeadJump(timenow : number)
     {
-        mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,-1,0])
+        mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,-2.1,0])
         
         if(this.isjumping == true)
         {
-            let jumpduration = 0.5;
+            let jumpduration = 0.4;
             let timepassed = timenow - this.timeofjumppress;
             let jumpdisplacement = Math.PI/2*(timepassed / jumpduration);
             this.jumpposition = Math.sin(jumpdisplacement);
 
             if(timepassed < 2*jumpduration)
-            { mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,  0.5 * Math.sin(jumpdisplacement) ,0]) }
+            { mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,  1.0 * Math.sin(jumpdisplacement) ,0]) }
             
             else 
             { this.isjumping = false; this.jumpposition = 0; }
@@ -155,7 +160,7 @@ export default class Player {
 
     private MovePlayerDirection()
     {
-        mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,0,1])
+        mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,0,2])
 
         if(this.playerdirection == 0 && this.playerposition == 1)
         {
@@ -165,27 +170,27 @@ export default class Player {
         else if(this.playerdirection == 1 && this.playerposition == 1)//from middle to left working
         {
             mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[this.xposition,0,0])
-            if(this.xposition < 0.8 ) this.xposition += 0.05;
+            if(this.xposition < this.maxlanedisp ) this.xposition += this.speedofsliding;
             else{this.playerdirection = 0 ;this.playerposition = 0;}
         }
         
         else if(this.playerdirection == 2 && this.playerposition == 1)//from middle to right working
         {
             mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[this.xposition,0,0])
-            if(this.xposition > -0.8) this.xposition -= 0.05;
+            if(this.xposition > -this.maxlanedisp) this.xposition -= this.speedofsliding;
             else{this.playerdirection = 0 ;this.playerposition = 2;}
         }
 
         else if(this.playerdirection == 2 && this.playerposition == 0)//from left to middle working
         {
-            if(this.xposition > 0) this.xposition -= 0.05;
+            if(this.xposition > 0) this.xposition -= this.speedofsliding;
             else{this.playerdirection = 0 ;this.playerposition = 1;}
             mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[this.xposition,0,0])
         }
         
         else if(this.playerdirection == 1 && this.playerposition == 2)//from right to middle working
         {
-            if(this.xposition < 0) this.xposition += 0.05;
+            if(this.xposition < 0) this.xposition += this.speedofsliding;
             else{this.playerdirection = 0 ;this.playerposition = 1;}
             mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[this.xposition,0,0])
         }
@@ -200,33 +205,33 @@ export default class Player {
 
     private MovePlayerHeadDirection()
     {
-        mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,0,1]) //for the head
+        mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,0,2]) //for the head
 
         if(this.playerdirection == 1 && this.playerposition == 1)//from middle to left working
         {
             mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[this.xposition,0,0])  //head
-            if(this.xposition < 0.8 ) this.xposition += 0.05;
+            if(this.xposition < this.maxlanedisp ) this.xposition += this.speedofsliding;
             else{this.playerdirection = 0 ;this.playerposition = 0;}
         }
         
         else if(this.playerdirection == 2 && this.playerposition == 1)//from middle to right working
         {
             mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[this.xposition,0,0]) //head
-            if(this.xposition > -0.8) this.xposition -= 0.05;
+            if(this.xposition > -this.maxlanedisp) this.xposition -= this.speedofsliding;
             else{this.playerdirection = 0 ;this.playerposition = 2;}
         }
 
         else if(this.playerdirection == 2 && this.playerposition == 0)//from left to middle working
         {
             mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[this.xposition,0,0])
-            if(this.xposition > 0) this.xposition -= 0.05;
+            if(this.xposition > 0) this.xposition -= this.speedofsliding;
             else{this.playerdirection = 0 ;this.playerposition = 1;}
         }
         
         else if(this.playerdirection == 1 && this.playerposition == 2)//from right to middle working
         {
             mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[this.xposition,0,0])
-            if(this.xposition < 0) this.xposition += 0.05;
+            if(this.xposition < 0) this.xposition += this.speedofsliding;
             else{this.playerdirection = 0 ;this.playerposition = 1;}
         }
 
