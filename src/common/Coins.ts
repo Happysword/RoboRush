@@ -77,7 +77,7 @@ export default class Coins extends Collider {
                     this.previousHitsLane.push(coinLane);
                     this.previousHitsDistance.push(coinDistance);
                     this.previousHitsTime.push(time);
-                    this.scoremanager.ChangeScore(1);
+                    this.scoremanager.ChangeScore(10);
                     return true;
                 }
             }

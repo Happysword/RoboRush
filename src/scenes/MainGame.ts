@@ -211,6 +211,7 @@ export default class MainGame extends Scene {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         
         let VP = this.camera.ViewProjectionMatrix; // Universal View-Projection Matrix (Constant Through The Whole Game)
+        
         this.time += deltaTime / 1000;             // Time in seconds we use delta time to be consitant on all computers 
         
         this.controller.update(deltaTime); //Only For testing purposes (will be removed) , it update control camera with mouse
@@ -222,7 +223,7 @@ export default class MainGame extends Scene {
         
         this.road.drawRoad(500 , this.camera.position);      // Draws Infinite Plane With X planes to be repeated
         
-        this.camera.Move(600 , 0.1 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
+        this.camera.Move(600 , 0.05 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
         
         this.player.Draw(VP,this.camera.getposition(), deltaTime);
         
@@ -234,11 +235,11 @@ export default class MainGame extends Scene {
         //SASA: NO not here but DOLA will do it by html and css
               
         //DOLA: /*The SCOREBOARD */
-        this.ctx.font = "40px Star Jedi";
+        this.ctx.font = "55px Star Jedi";
         this.ctx.fillStyle = "yellow";
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.ctx.textAlign = "center";
-        this.ctx.fillText("SCoRE " + this.scoremanager.Score, this.ctx.canvas.width/2, 50);
+        this.ctx.fillText("SCoRE " + (this.scoremanager.Score + Math.floor( this.time * 2 )), this.ctx.canvas.width/2, 50);
         this.scoreStaticCounter = 0;
     }
     
