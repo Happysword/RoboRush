@@ -3,20 +3,37 @@ import Game from './common/game';
 import MainGame from './scenes/MainGame';
 
 // First thing we need is to get the canvas on which we draw our scenes
-const canvas: HTMLCanvasElement = document.querySelector("#app");
+
 
 // Then we create an instance of the game class and give it the canvas
-const game = new Game(canvas);
 
-// Here we list all our scenes and our initial scene
-const scenes = {
-    "MainGame": MainGame,
-};
-const initialScene = "MainGame";
+window.addEventListener('load', function ()     /*the game won't start till the window is loaded (the window contains the document which contains both canvas elements) */
+{
+    const canvas: HTMLCanvasElement = document.querySelector("#app");
+    const overCanvas: HTMLCanvasElement = document.querySelector("#overCanvas");
+ 
+    (document as any).fonts.load('20px Russo One').then(startGame());   /*wait till the fonts file loads*/
 
-// Then we add those scenes to the game object and ask it to start the initial scene
-game.addScenes(scenes);
-game.startScene(initialScene);
+    function startGame()
+    {
+        const game = new Game(canvas, overCanvas);
+
+        // Here we list all our scenes and our initial scene
+        const scenes = {
+            "MainGame": MainGame,
+        };
+        const initialScene = "MainGame";
+
+        // Then we add those scenes to the game object and ask it to start the initial scene
+        game.addScenes(scenes);
+        game.startScene(initialScene);
+        (document.querySelector("#app") as any).focus();    /*Set the focus on the game canvas */
+    }
+    
+});
+window.addEventListener("click", function(event) {
+    (document.querySelector("#app") as any).focus();        /**if the user clicked any where on the window the game canvas will get the focus */
+});
 
 /*// Here we setup a selector element to switch scenes from the webpage
 const selector: HTMLSelectElement = document.querySelector("#scenes");

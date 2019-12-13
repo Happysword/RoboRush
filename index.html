@@ -8,10 +8,17 @@
     <link rel="stylesheet" href="./style.scss">
 </head>
 <body>
+        
     <div>
-        <canvas width="960" height="540" id="app" tabindex="1">
+        <canvas width="960" height="540" id="app" tabindex="1" >
             <!-- Here is where we will draw our scene -->
         </canvas>
+
+        <canvas  id="overCanvas"  tabindex="-1"> 
+            <!-- Here is where we will write the score -->
+            <!-- it will be over the game canvas -->
+        </canvas>
+
     </div>
     <div id="controls"></div>
     <!-- The following line includes our script which will run WebGL -->

@@ -5,9 +5,14 @@ import Input from './input'; // Used to manage the user input
 export abstract class Scene {
     game: Game;
     gl: WebGL2RenderingContext;
+    ctx: CanvasRenderingContext2D;
     public constructor(game: Game){
         this.game = game;
         this.gl = game.gl;
+
+        ////////////////////////////////////////////////////////////
+        this.ctx = game.ctx;
+        ////////////////////////////////////////////////////////////
     }
 
     public abstract load(): void; // Here we will tell the loader which files to load from the webserver
@@ -27,9 +32,25 @@ export default class Game {
     nextScene: Scene = null; // The scene that will replace the current scene after its files have been loaded
     nextSceneReady: boolean = false; // Whether the files requested by the next scene has been loaded or not 
     lastTick: number; // The time of the last frame in milliseconds (used to calculate delta time)
+    overCanvas: HTMLCanvasElement;
 
-    constructor(canvas: HTMLCanvasElement){
+    ////////////////////////////////////////////////////////////
+    ctx: CanvasRenderingContext2D;
+    staticCounter: number = 0;
+    dpi: number;
+    ////////////////////////////////////////////////////////////
+
+
+    constructor(canvas: HTMLCanvasElement, overCanvas: HTMLCanvasElement){
         this.canvas = canvas;
+
+
+        ////////////////////////////////////////////////////////////
+        this.overCanvas = overCanvas;
+        this.dpi = window.devicePixelRatio;
+        this.fix_dpi();
+        //////////////////////////////////////////////////////////
+
         this.gl = this.canvas.getContext("webgl2", {
             preserveDrawingBuffer: true, // This will prevent the Browser from automatically clearing the frame buffer every frame
             alpha: true, // this will tell the browser that we want an alpha component in our frame buffer
@@ -39,6 +60,8 @@ export default class Game {
             premultipliedAlpha: false, // This can be used if the canvas are going to be blended with the rest of the webpage (transparency)
             stencil: true // this will tell the browser that we want a stencil buffer
         }); // This command loads the WebGL2 context which we will use to draw
+
+        this.ctx = this.overCanvas.getContext("2d");
         this.input = new Input(this.canvas);
         this.lastTick = performance.now();
         this.loop(performance.now()); // Start the game loop
@@ -62,6 +85,20 @@ export default class Game {
             console.warn(`Scene "${name}" not found`);
         }
     }
+    ////////////////////////////////////////////////////////////
+    /*Fixes pixelization in score canvas (called in the constructor of class game*/
+    private fix_dpi() { 
+        //get CSS height
+        //the + prefix casts it to an integer
+        //the slice method gets rid of "px"
+        let style_height = +getComputedStyle(this.overCanvas).getPropertyValue("height").slice(0, -2);
+        //get CSS width
+        let style_width = +getComputedStyle(this.overCanvas).getPropertyValue("width").slice(0, -2);
+        //scale the canvas
+        this.overCanvas.setAttribute('height', (style_height * this.dpi).toString());
+        this.overCanvas.setAttribute('width', (style_width * this.dpi).toString());
+    }
+    ////////////////////////////////////////////////////////////
 
     private loop(time: DOMHighResTimeStamp){
         requestAnimationFrame((time) => this.loop(time)); // Tell the browser to call this function again when the next frame needs to be drawn
@@ -72,10 +109,12 @@ export default class Game {
             this.currentScene.start(); // Tell the scene to initialize its objects
         }
         if(this.currentScene != null){
-            this.currentScene.draw(time-this.lastTick); // Tell the scene to draw itself
+            this.currentScene.draw(time - this.lastTick); // Tell the scene to draw itself
         }
         this.input.update(); // Update some information about the user input
         this.lastTick = time;
+
+       
     }
 
 }

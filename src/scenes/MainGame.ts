@@ -44,7 +44,7 @@ export default class MainGame extends Scene {
     skyBox : SkyBox;
     ifm : inputFileManager;
     obstaclesArray: number[][];
-
+    scoreStaticCounter: number = 0;
 
     static readonly cubemapDirections = ['negx', 'negy', 'negz', 'posx', 'posy', 'posz']
 
@@ -206,7 +206,8 @@ export default class MainGame extends Scene {
      
     }
     
-    public draw(deltaTime: number): void {
+    public draw(deltaTime: number): void 
+    {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         
         let VP = this.camera.ViewProjectionMatrix; // Universal View-Projection Matrix (Constant Through The Whole Game)
@@ -229,9 +230,17 @@ export default class MainGame extends Scene {
         this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
         this.spikes.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
 
-        // Here should draw score ? NO not here but DOLA will do it by html and css
-
-        }
+        // LOLO: Here should draw score ? 
+        //SASA: NO not here but DOLA will do it by html and css
+              
+        //DOLA: /*The SCOREBOARD */
+        this.ctx.font = "40px Star Jedi";
+        this.ctx.fillStyle = "yellow";
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        this.ctx.textAlign = "center";
+        this.ctx.fillText("SCoRE " + this.scoremanager.Score, this.ctx.canvas.width/2, 50);
+        this.scoreStaticCounter = 0;
+    }
     
     public end(): void {
         this.roadProgram.dispose();
