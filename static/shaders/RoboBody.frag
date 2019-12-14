@@ -1,6 +1,15 @@
 #version 300 es
 precision highp float;
 
+in vec4 v_color;
+in vec2 v_texcoord;
+in vec3 v_normal;
+in vec3 v_FragPos;
+in vec3 v_view;
+in vec3 v_world;
+
+out vec4 color;
+
 struct Material {
     sampler2D diffuse;
     sampler2D specular;    
@@ -14,14 +23,8 @@ struct Light {
     vec3 specular;
 };
 
-in vec4 v_color;
-in vec2 v_texcoord;
-in vec3 v_normal;
-in vec3 v_FragPos;
-in vec3 v_view;
 
 
-out vec4 color;
 
 uniform vec4 tint;
 uniform sampler2D texture_sampler;
@@ -55,5 +58,5 @@ void main(){
     vec3 specular = lightSpecular * spec;  
 
     vec3 result = ambient + diffuse + specular;
-    color = vec4(result, 1.0);
+    color = vec4(result, 1.0) * tint;
 }

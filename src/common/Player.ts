@@ -3,6 +3,7 @@ import ShaderProgram from './shader-program';
 import Mesh from '../common/mesh';
 import Input from '../common/input';
 import Camera from './camera';
+import ScoreManager from './ScoreManager';
 
 export default class Player {
 
@@ -41,7 +42,7 @@ export default class Player {
     }
 
 
-    public Draw (VP : mat4 ,camerapos : vec3 , DeltaTime : number )
+    public Draw (VP : mat4 ,camerapos : vec3 , DeltaTime : number , isLost : boolean )
     {
         this.time += DeltaTime / 1000; 
 
@@ -54,9 +55,13 @@ export default class Player {
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.roboBodyTexture);
         this.PlayerBodyProgram.setUniform1i('texture_sampler', 0);
         
-        this.setPlayerDirection();
+        console.log(isLost);
+        if(!isLost)                     //if lost don't move
+        {
+            this.setPlayerDirection();
+            this.setPlayerJump(this.time);
+        }
         this.MovePlayerDirection();
-        this.setPlayerJump(this.time);
         this.MovePlayerJump(this.time);
         
         
@@ -65,7 +70,14 @@ export default class Player {
         this.PlayerBodyProgram.setUniformMatrix4fv("VP", false, VP);
         this.PlayerBodyProgram.setUniform3f('cam_position' , camerapos);
         this.PlayerBodyProgram.setUniformMatrix4fv("MVP", false, this.PlayerBodyMat);
-        this.PlayerBodyProgram.setUniform4f("tint", [1, 1, 1, 1]);
+        if(!isLost)
+        {
+            this.PlayerBodyProgram.setUniform4f("tint", [1, 1, 1, 1]);
+        }
+        else
+        {
+            this.PlayerBodyProgram.setUniform4f("tint", [1, ((Math.abs(Math.sin(this.time*5))+0.5)/2)+0.2, ((Math.abs(Math.sin(this.time*5))+0.2)/2)+0.5, 1]);
+        }
         this.PlayerBodyMesh.draw(this.gl.TRIANGLES);
         
         //*************** Head part same as body ******************/
@@ -88,7 +100,14 @@ export default class Player {
         this.PlayerHeadProgram.setUniformMatrix4fv("VP", false, VP);
         this.PlayerHeadProgram.setUniformMatrix4fv("MVP", false, this.PlayerHeadMat);
         this.PlayerHeadProgram.setUniform3f('cam_position' , camerapos);
-        this.PlayerHeadProgram.setUniform4f("tint", [1, 1, 1, 1]);
+        if(!isLost)
+        {
+            this.PlayerHeadProgram.setUniform4f("tint", [1, 1, 1, 1]);
+        }
+        else
+        {
+            this.PlayerHeadProgram.setUniform4f("tint", [1, ((Math.abs(Math.sin(this.time*5))+0.2)/2)+0.5, ((Math.abs(Math.sin(this.time*5))+0.2)/2)+0.5, 1]);
+        }
         this.PlayerHeadMesh.draw(this.gl.TRIANGLES);
 
     }

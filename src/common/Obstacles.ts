@@ -76,8 +76,9 @@ export default class Obstacles extends Collider {
         {
             // in the left bracket value of collision distance to calculate from behind user
             // in the right bracket value of collision distance to calculate from infront of user
-            if ((obstacleDistance >= (cameraPos[2] + 1)) && (obstacleDistance <= (cameraPos[2] + 2.5)))
+            if ((obstacleDistance >= (cameraPos[2] + 1)) && (obstacleDistance <= (cameraPos[2] + 3.4)))
             {
+                console.log(obstacleDistance);
                 this.previousHitsLane.push(obstacleLane);
                 this.previousHitsDistance.push(obstacleDistance);
                 this.previousHitsTime.push(time);
@@ -109,14 +110,14 @@ export default class Obstacles extends Collider {
         // else middle lane
 
         // if collided then don't draw
-        if (!this.didCollide(lane, distance, playerPos, cameraPos, time))
-        {
-            mat4.scale(obstacleMat, obstacleMat , [0.8 , 0.8 , 0.8]);
-            mat4.translate(obstacleMat , obstacleMat , [1,-2,0]);
-            mat4.rotateY(obstacleMat , obstacleMat , Math.PI/4)
-            this.ObstaclesProgram.setUniformMatrix4fv("MVP", false, obstacleMat);
-            this.ObstaclesProgram.setUniform4f("tint", [1, 1, 1, 1]);
-            this.ObstaclesMesh.draw(this.gl.TRIANGLES);
-        }
+        this.didCollide(lane, distance, playerPos, cameraPos, time)            //actually we need to draw them when hit
+        
+        mat4.scale(obstacleMat, obstacleMat , [0.8 , 0.8 , 0.8]);
+        mat4.translate(obstacleMat , obstacleMat , [1,-2,0]);
+        mat4.rotateY(obstacleMat , obstacleMat , Math.PI/4)
+        this.ObstaclesProgram.setUniformMatrix4fv("MVP", false, obstacleMat);
+        this.ObstaclesProgram.setUniform4f("tint", [1, 1, 1, 1]);
+        this.ObstaclesMesh.draw(this.gl.TRIANGLES);
+        
     }
 }

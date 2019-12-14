@@ -81,7 +81,7 @@ export default class Spikes extends Collider {
             {
                 // in the left bracket value of collision distance to calculate from behind user
                 // in the right bracket value of collision distance to calculate from infront of user
-                if ((spikeDistance >= (cameraPos[2] + 1)) && (spikeDistance <= (cameraPos[2] + 2.4)))
+                if ((spikeDistance >= (cameraPos[2] + 1)) && (spikeDistance <= (cameraPos[2] + 2.85)))
                 {
                     this.previousHitsLane.push(spikeLane);
                     this.previousHitsDistance.push(spikeDistance);
@@ -115,13 +115,12 @@ export default class Spikes extends Collider {
         // else middle lane
 
         // if collided then don't draw
-        if (!this.didCollide(lane, distance, playerPos, cameraPos, time))
-        {
-            mat4.scale(spikeMat , spikeMat , [2,2,2]);
-            mat4.translate(spikeMat, spikeMat, [0, -0.8, 0]);
-            this.SpikesProgram.setUniformMatrix4fv("MVP", false, spikeMat);
-            this.SpikesProgram.setUniform4f("tint", [1, 1, 1, 1]);
-            this.SpikesMesh.draw(this.gl.TRIANGLES);
-        }
+        this.didCollide(lane, distance, playerPos, cameraPos, time)
+        mat4.scale(spikeMat , spikeMat , [2,2,2]);
+        mat4.translate(spikeMat, spikeMat, [0, -0.8, 0]);
+        this.SpikesProgram.setUniformMatrix4fv("MVP", false, spikeMat);
+        this.SpikesProgram.setUniform4f("tint", [1, 1, 1, 1]);
+        this.SpikesMesh.draw(this.gl.TRIANGLES);
+        
     }
 }

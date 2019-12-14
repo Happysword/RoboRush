@@ -6,6 +6,7 @@ layout(location=3) in vec3 normal;
 
 out vec4 v_color;
 out vec2 v_texcoord;
+out vec3 v_world;
 out vec3 v_normal;
 out vec3 v_FragPos;
 out vec3 v_view;
@@ -23,5 +24,6 @@ void main(){
     mat4 Model_inverse_transpose = mat4(transpose(inverse(Model)));
     v_normal = (Model_inverse_transpose * vec4(normal, 0.0f)).xyz;
     v_FragPos = vec3(Model * vec4(position, 1.0f));
-    v_view = (Model * vec4(position, 1.0f)).xyz - cam_position;
+    v_world = v_FragPos;
+    v_view = cam_position - v_FragPos;
 }

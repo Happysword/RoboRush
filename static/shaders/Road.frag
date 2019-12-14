@@ -19,6 +19,7 @@ in vec2 v_texcoord;
 in vec3 v_normal;
 in vec3 v_FragPos;
 in vec3 v_view;
+in vec3 v_world;
 
 
 out vec4 color;

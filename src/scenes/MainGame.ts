@@ -18,6 +18,7 @@ import ScoreManager from '../common/ScoreManager';
 import SkyBox from '../common/SkyBox';
 import inputFileManager from '../common/inputFileManager';
 
+
 export default class MainGame extends Scene {
     
     roadProgram: ShaderProgram;
@@ -213,7 +214,10 @@ export default class MainGame extends Scene {
         
         let VP = this.camera.ViewProjectionMatrix; // Universal View-Projection Matrix (Constant Through The Whole Game)
         
-        this.time += deltaTime / 1000;             // Time in seconds we use delta time to be consitant on all computers 
+        if(!this.scoremanager.Lose)
+        {
+            this.time += deltaTime / 1000;             // Time in seconds we use delta time to be consitant on all computers 
+        }
         
         this.controller.update(deltaTime); //Only For testing purposes (will be removed) , it update control camera with mouse
         
@@ -224,11 +228,12 @@ export default class MainGame extends Scene {
         
         this.road.drawRoad(500 , this.camera.position);      // Draws Infinite Plane With X planes to be repeated
         
-        this.camera.Move(130 , 0.05 + (this.time/500) , this.camera, this.ifm);  // Makes camera Move until distance X (calculated from origin) with speed Y
+        if(!this.scoremanager.Lose)
+        {
+            this.camera.Move(130 , 0.05 + (this.time/1000) , this.camera, this.ifm);  // Makes camera Move until distance X (calculated from origin) with speed Y
+        }
         
-        console.log(vec3.distance([0,0,0] , this.camera.position));
-
-        this.player.Draw(VP,this.camera.getposition(), deltaTime);
+        this.player.Draw(VP,this.camera.getposition(), deltaTime , this.scoremanager.Lose);
         
         this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset);
         this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset);
