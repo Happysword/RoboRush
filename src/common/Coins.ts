@@ -32,7 +32,7 @@ export default class Coins extends Collider {
         this.obstaclesLocations = locations;
     }
     
-    public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number)
+    public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number, offset : number)
     {
         this.coinsMat = mat4.clone(VP);
         
@@ -50,7 +50,7 @@ export default class Coins extends Collider {
             {
                 if (this.obstaclesLocations[i][j] == 1)  // coins code is 1
                 {
-                    this.drawCoin(j, (i * 10), playerPos, cameraPos, time);     // distance between each obstacles is 10
+                    this.drawCoin(j, offset + (i * 10), playerPos, cameraPos, time);     // distance between each obstacles is 10
                 }
             }
         }

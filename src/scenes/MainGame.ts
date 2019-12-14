@@ -44,6 +44,7 @@ export default class MainGame extends Scene {
     skyBox : SkyBox;
     ifm : inputFileManager;
     obstaclesArray: number[][];
+    obstaclesOffset : number = 20; // where obstacles start from
     scoreStaticCounter: number = 0;
 
     static readonly cubemapDirections = ['negx', 'negy', 'negz', 'posx', 'posy', 'posz']
@@ -227,9 +228,9 @@ export default class MainGame extends Scene {
         
         this.player.Draw(VP,this.camera.getposition(), deltaTime);
         
-        this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
-        this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
-        this.spikes.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time);
+        this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset);
+        this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset);
+        this.spikes.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset);
 
         // LOLO: Here should draw score ? 
         //SASA: NO not here but DOLA will do it by html and css

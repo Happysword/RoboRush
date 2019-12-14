@@ -32,7 +32,7 @@ export default class Spikes extends Collider {
         this.obstaclesLocations = locations;
     }
 
-    public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number)
+    public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number, offset : number)
     {
         this.SpikesMat = mat4.clone(VP);
         
@@ -50,7 +50,7 @@ export default class Spikes extends Collider {
             {
                 if (this.obstaclesLocations[i][j] == 2)  // spikes code is 2
                 {
-                    this.drawSpike(j, (i * 10), playerPos, cameraPos, time);     // distance between each obstacles is 10
+                    this.drawSpike(j, offset + (i * 10), playerPos, cameraPos, time);     // distance between each obstacles is 10
                 }
             }
         }
