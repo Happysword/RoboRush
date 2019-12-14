@@ -16,8 +16,9 @@ export default class Coins extends Collider {
     previousHitsDistance : number[];
     previousHitsTime : number[];
     scoremanager : ScoreManager;
-    
-    public constructor (GL : WebGL2RenderingContext, coinsprogram : ShaderProgram, coinsmesh : Mesh, scoresManager : ScoreManager, playerinst : Player , wrenchTexture : WebGLTexture)
+    obstaclesLocations: number[][];
+
+    public constructor (GL : WebGL2RenderingContext, coinsprogram : ShaderProgram, coinsmesh : Mesh, scoresManager : ScoreManager, playerinst : Player , wrenchTexture : WebGLTexture, locations : number[][])
     {
         super(GL);
         this.CoinsProgram = coinsprogram;
@@ -28,6 +29,7 @@ export default class Coins extends Collider {
         this.scoremanager = scoresManager;
         this.player = playerinst;
         this.CoinsTexture = wrenchTexture;
+        this.obstaclesLocations = locations;
     }
     
     public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number)
@@ -39,11 +41,18 @@ export default class Coins extends Collider {
         this.CoinsProgram.setUniform1i('texture_sampler', 0);
         this.CoinsProgram.setUniform3f('cam_position' , cameraPos);
         this.CoinsProgram.setUniformMatrix4fv("VP", false, VP);
+
         // Draw all coins here should put (Lane of Coin, distance of coin, leave the rest as is)
         // Lane of Coin 0=>left lane, 1=>middle lane, 2=>right lane 
-        for (var i = 0; i < 500; i += 5)
+        for (var i = 0; i < this.obstaclesLocations.length; i++)
         {
-            this.drawCoin(1, i, playerPos, cameraPos, time);
+            for (var j = 0; j < this.obstaclesLocations[i].length; j++)
+            {
+                if (this.obstaclesLocations[i][j] == 1)  // coins code is 1
+                {
+                    this.drawCoin(j, (i * 10), playerPos, cameraPos, time);     // distance between each obstacles is 10
+                }
+            }
         }
     }
     
@@ -66,13 +75,13 @@ export default class Coins extends Collider {
             }
         }
         // if coin not collided before and collided with user then don't draw it
-        if (!((this.player.getscaledyposition() > 5) && (this.player.isjumping)))
+        if (!((this.player.getscaledyposition() > 8) && (this.player.isjumping)))
         {
             if (coinLane == playerPos)
             {
                 // in the left bracket value of collision distance to calculate from behind user
                 // in the right bracket value of collision distance to calculate from infront of user
-                if ((coinDistance >= (cameraPos[2])) && (coinDistance <= (cameraPos[2] + 2.5)))
+                if ((coinDistance >= (cameraPos[2] + 1.5)) && (coinDistance <= (cameraPos[2] + 2.3)))
                 {
                     this.previousHitsLane.push(coinLane);
                     this.previousHitsDistance.push(coinDistance);

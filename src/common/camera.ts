@@ -1,4 +1,5 @@
 import { vec3, mat4 } from 'gl-matrix';
+import InputFileManager from './inputFileManager';
 
 // Just for organization, we will keep all of our camera data and functions in here
 
@@ -39,13 +40,14 @@ export default class Camera {
         return vec3.cross(up, this.direction, up);
     }
 
-    public Move(maxDistance : number, speed : number , camera : Camera)
+    public Move(maxDistance : number, speed : number , camera : Camera, ifm : InputFileManager)
     {
         vec3.add(camera.position ,camera.position, [ 0, 0 , speed]);
 
         if(vec3.distance([0,0,0] , camera.position) > maxDistance )
         {
             camera.position = vec3.fromValues(0,2.5,-2);
+            ifm.shuffleArray();
         }
     }
 

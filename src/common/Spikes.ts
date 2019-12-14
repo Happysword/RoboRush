@@ -16,8 +16,9 @@ export default class Spikes extends Collider {
     previousHitsDistance : number[];
     previousHitsTime : number[];
     scoremanager : ScoreManager;
+    obstaclesLocations: number[][];
     
-    public constructor (GL : WebGL2RenderingContext, spikeprogram : ShaderProgram, spikemesh : Mesh, scoresManager : ScoreManager, playerinst : Player , spikeTexture : WebGLTexture)
+    public constructor (GL : WebGL2RenderingContext, spikeprogram : ShaderProgram, spikemesh : Mesh, scoresManager : ScoreManager, playerinst : Player , spikeTexture : WebGLTexture, locations : number[][])
     {
         super(GL);
         this.SpikesProgram = spikeprogram;
@@ -28,6 +29,7 @@ export default class Spikes extends Collider {
         this.scoremanager = scoresManager;
         this.player = playerinst;
         this.SpikesTexture = spikeTexture;
+        this.obstaclesLocations = locations;
     }
 
     public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number)
@@ -40,11 +42,17 @@ export default class Spikes extends Collider {
         this.SpikesProgram.setUniformMatrix4fv("VP", false, VP);
         this.SpikesProgram.setUniform1i('texture_sampler', 0);
 
-        for (var i = 0; i < 500; i += 5)
+        // Draw all obstacles here should put (Lane of obstacle, distance of obstacle, leave the rest as is)
+        // Lane of obstacle 0=>left lane, 1=>middle lane, 2=>right lane 
+        for (var i = 0; i < this.obstaclesLocations.length; i++)
         {
-            // Draw all obstacles here should put (Lane of obstacle, distance of obstacle, leave the rest as is)
-            // Lane of obstacle 0=>left lane, 1=>middle lane, 2=>right lane 
-            this.drawSpike(0, i, playerPos, cameraPos, time);
+            for (var j = 0; j < this.obstaclesLocations[i].length; j++)
+            {
+                if (this.obstaclesLocations[i][j] == 2)  // spikes code is 2
+                {
+                    this.drawSpike(j, (i * 10), playerPos, cameraPos, time);     // distance between each obstacles is 10
+                }
+            }
         }
     }
 
@@ -67,13 +75,13 @@ export default class Spikes extends Collider {
             }
         }
         // if obstacle not collided before and collided with user then don't draw it
-        if (!((this.player.getscaledyposition() > 3) && (this.player.isjumping)))
+        if (!((this.player.getscaledyposition() > 2.5) && (this.player.isjumping)))
         {
             if (spikeLane == playerPos)
             {
                 // in the left bracket value of collision distance to calculate from behind user
                 // in the right bracket value of collision distance to calculate from infront of user
-                if ((spikeDistance >= (cameraPos[2])) && (spikeDistance <= (cameraPos[2] + 2.5)))
+                if ((spikeDistance >= (cameraPos[2] + 1)) && (spikeDistance <= (cameraPos[2] + 2.4)))
                 {
                     this.previousHitsLane.push(spikeLane);
                     this.previousHitsDistance.push(spikeDistance);

@@ -183,9 +183,9 @@ export default class MainGame extends Scene {
         // Just loading any positions for coins now but later should be loaded from file ?
         // for now just put coins everywhere
         
-        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['wrench'], this.scoremanager, this.player , this.textures['wrench']);
-        this.obstacles = new Obstacles(this.gl, this.obstaclesprogram, this.meshes['barrel'], this.scoremanager , this.textures['barrel']);
-        this.spikes = new Spikes(this.gl, this.spikesprogram, this.meshes['spikes'], this.scoremanager, this.player , this.textures['spikes']);
+        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['wrench'], this.scoremanager, this.player , this.textures['wrench'], this.obstaclesArray);
+        this.obstacles = new Obstacles(this.gl, this.obstaclesprogram, this.meshes['barrel'], this.scoremanager , this.textures['barrel'], this.obstaclesArray);
+        this.spikes = new Spikes(this.gl, this.spikesprogram, this.meshes['spikes'], this.scoremanager, this.player , this.textures['spikes'], this.obstaclesArray);
         
         /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
         
@@ -223,7 +223,7 @@ export default class MainGame extends Scene {
         
         this.road.drawRoad(500 , this.camera.position);      // Draws Infinite Plane With X planes to be repeated
         
-        this.camera.Move(600 , 0.05 , this.camera);  // Makes camera Move until distance X (calculated from origin) with speed Y
+        this.camera.Move(600 , 0.05 , this.camera, this.ifm);  // Makes camera Move until distance X (calculated from origin) with speed Y
         
         this.player.Draw(VP,this.camera.getposition(), deltaTime);
         

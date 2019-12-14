@@ -14,8 +14,9 @@ export default class Obstacles extends Collider {
     previousHitsDistance : number[];
     previousHitsTime : number[];
     scoremanager : ScoreManager;
+    obstaclesLocations: number[][];
     
-    public constructor (GL : WebGL2RenderingContext, obstaclesprogram : ShaderProgram, obstaclesmesh : Mesh, scoresManager : ScoreManager, barrelTexture : WebGLTexture)
+    public constructor (GL : WebGL2RenderingContext, obstaclesprogram : ShaderProgram, obstaclesmesh : Mesh, scoresManager : ScoreManager, barrelTexture : WebGLTexture, locations : number[][])
     {
         super(GL);
         this.ObstaclesProgram = obstaclesprogram;
@@ -25,6 +26,7 @@ export default class Obstacles extends Collider {
         this.previousHitsTime = new Array<number>();
         this.scoremanager = scoresManager;
         this.ObstaclesTexture = barrelTexture;
+        this.obstaclesLocations = locations;
     }
     
     public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number)
@@ -37,11 +39,17 @@ export default class Obstacles extends Collider {
         this.ObstaclesProgram.setUniform3f('cam_position' , cameraPos);
         this.ObstaclesProgram.setUniformMatrix4fv("VP", false, VP);
 
-        for (var i = 0; i < 500; i += 5)
+        // Draw all obstacles here should put (Lane of obstacle, distance of obstacle, leave the rest as is)
+        // Lane of obstacle 0=>left lane, 1=>middle lane, 2=>right lane 
+        for (var i = 0; i < this.obstaclesLocations.length; i++)
         {
-            // Draw all obstacles here should put (Lane of obstacle, distance of obstacle, leave the rest as is)
-            // Lane of obstacle 0=>left lane, 1=>middle lane, 2=>right lane 
-            this.drawObstacle(2, i, playerPos, cameraPos, time);
+            for (var j = 0; j < this.obstaclesLocations[i].length; j++)
+            {
+                if (this.obstaclesLocations[i][j] == 3)  // obstacle code is 3
+                {
+                    this.drawObstacle(j, (i * 10), playerPos, cameraPos, time);     // distance between each obstacles is 10
+                }
+            }
         }
     }
 
@@ -68,7 +76,7 @@ export default class Obstacles extends Collider {
         {
             // in the left bracket value of collision distance to calculate from behind user
             // in the right bracket value of collision distance to calculate from infront of user
-            if ((obstacleDistance >= (cameraPos[2])) && (obstacleDistance <= (cameraPos[2] + 2.5)))
+            if ((obstacleDistance >= (cameraPos[2] + 1)) && (obstacleDistance <= (cameraPos[2] + 2.5)))
             {
                 this.previousHitsLane.push(obstacleLane);
                 this.previousHitsDistance.push(obstacleDistance);
