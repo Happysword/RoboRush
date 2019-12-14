@@ -28,6 +28,7 @@ export default class Player {
     time: number = 0;
     maxlanedisp: number = 1.7;
     speedofsliding: number = 0.07;
+    jumpduration:number = 0.4;
 
     constructor( Playerbodyprogram : ShaderProgram, playerheadprogram : ShaderProgram , playerbodymesh : Mesh, playerheadmesh : Mesh ,GL : WebGL2RenderingContext, input:Input , bodyTexture : WebGLTexture , headtexture : WebGLTexture)
     {
@@ -45,6 +46,19 @@ export default class Player {
     public Draw (VP : mat4 ,camerapos : vec3 , DeltaTime : number , isLost : boolean )
     {
         this.time += DeltaTime / 1000; 
+
+        if(this.time < 300) //make player faster to go to lanes with time
+        {
+            this.speedofsliding = 0.05;
+            this.speedofsliding = this.speedofsliding + (this.time / 2000);
+        }
+
+        if(this.time < 70) //make player jump faster with time
+        {
+            this.jumpduration = 0.6;
+            this.jumpduration = this.jumpduration - (this.time /200);
+            console.log(this.time);
+        }
 
         this.PlayerBodyMat = mat4.clone(VP);
         
@@ -144,11 +158,10 @@ export default class Player {
         
         if(this.isjumping == true)
         {
-            let jumpduration = 0.4;
             let timepassed = timenow - this.timeofjumppress;
-            let jumpdisplacement = Math.PI/2*(timepassed / jumpduration);
+            let jumpdisplacement = Math.PI/2*(timepassed / this.jumpduration);
 
-            if(timepassed < 2*jumpduration)
+            if(timepassed < 2*this.jumpduration)
             { mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,  1.0 * Math.sin(jumpdisplacement) ,0]) }
             
             else 
@@ -164,12 +177,11 @@ export default class Player {
         
         if(this.isjumping == true)
         {
-            let jumpduration = 0.4;
             let timepassed = timenow - this.timeofjumppress;
-            let jumpdisplacement = Math.PI/2*(timepassed / jumpduration);
+            let jumpdisplacement = Math.PI/2*(timepassed / this.jumpduration);
             this.jumpposition = Math.sin(jumpdisplacement);
 
-            if(timepassed < 2*jumpduration)
+            if(timepassed < 2*this.jumpduration)
             { mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,  1.0 * Math.sin(jumpdisplacement) ,0]) }
             
             else 
