@@ -224,8 +224,10 @@ export default class MainGame extends Scene {
         
         this.road.drawRoad(500 , this.camera.position);      // Draws Infinite Plane With X planes to be repeated
         
-        this.camera.Move(600 , 0.05 , this.camera, this.ifm);  // Makes camera Move until distance X (calculated from origin) with speed Y
+        this.camera.Move(130 , 0.05 + (this.time/500) , this.camera, this.ifm);  // Makes camera Move until distance X (calculated from origin) with speed Y
         
+        console.log(vec3.distance([0,0,0] , this.camera.position));
+
         this.player.Draw(VP,this.camera.getposition(), deltaTime);
         
         this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset);
