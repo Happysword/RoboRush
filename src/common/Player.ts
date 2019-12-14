@@ -55,7 +55,6 @@ export default class Player {
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.roboBodyTexture);
         this.PlayerBodyProgram.setUniform1i('texture_sampler', 0);
         
-        console.log(isLost);
         if(!isLost)                     //if lost don't move
         {
             this.setPlayerDirection();
@@ -66,7 +65,10 @@ export default class Player {
         
         
         mat4.scale(this.PlayerBodyMat,this.PlayerBodyMat,[0.4,0.4,0.4])
-        mat4.rotateX(this.PlayerBodyMat , this.PlayerBodyMat , this.time * 9);
+        if(!isLost)
+        {
+            mat4.rotateX(this.PlayerBodyMat , this.PlayerBodyMat , this.time * 9);
+        }
         this.PlayerBodyProgram.setUniformMatrix4fv("VP", false, VP);
         this.PlayerBodyProgram.setUniform3f('cam_position' , camerapos);
         this.PlayerBodyProgram.setUniformMatrix4fv("MVP", false, this.PlayerBodyMat);

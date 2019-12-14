@@ -17,7 +17,14 @@ import Spikes from '../common/Spikes';
 import ScoreManager from '../common/ScoreManager';
 import SkyBox from '../common/SkyBox';
 import inputFileManager from '../common/inputFileManager';
+import {Howl, Howler} from 'howler';
 
+var sound = new Howl({
+    src: ['star-wars-main-theme.mp3'],
+    autoplay: true,
+    loop: true,
+    volume: 0.5,
+  });
 
 export default class MainGame extends Scene {
     
@@ -84,11 +91,12 @@ export default class MainGame extends Scene {
     } 
     
     public start(): void {
-        /*******************************  Initializing all the Programs *******************************/
+        
         this.ifm = new inputFileManager(this.game.loader.resources["inputFile.txt"]);
         this.obstaclesArray = this.ifm.getArray();
         
-
+        /*******************************  Initializing all the Programs *******************************/
+        
         this.roadProgram = new ShaderProgram(this.gl);
         this.roadProgram.attach(this.game.loader.resources["Road.vert"], this.gl.VERTEX_SHADER);
         this.roadProgram.attach(this.game.loader.resources["Road.frag"], this.gl.FRAGMENT_SHADER);
@@ -259,4 +267,3 @@ export default class MainGame extends Scene {
     }
     
 }
-
