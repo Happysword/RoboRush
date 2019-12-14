@@ -65,7 +65,7 @@ export default class Coins extends Collider {
             var index = this.previousHitsDistance.indexOf(coinDistance);
             if (this.previousHitsLane[index] == coinLane)
             {
-                if ((time - this.previousHitsTime[index]) > 5)
+                if ((time - this.previousHitsTime[index]) > 1)
                 {
                     this.previousHitsDistance.splice(index, 1);
                     this.previousHitsLane.splice(index, 1);

@@ -65,7 +65,7 @@ export default class Spikes extends Collider {
             var index = this.previousHitsDistance.indexOf(spikeDistance);
             if (this.previousHitsLane[index] == spikeLane)
             {
-                if ((time - this.previousHitsTime[index]) > 5)
+                if ((time - this.previousHitsTime[index]) > 1)
                 {
                     this.previousHitsDistance.splice(index, 1);
                     this.previousHitsLane.splice(index, 1);
