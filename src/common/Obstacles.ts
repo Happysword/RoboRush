@@ -16,6 +16,7 @@ export default class Obstacles extends Collider {
     scoremanager : ScoreManager;
     obstaclesLocations: number[][];
     distanceBetweenObstacles : number;
+
     
     public constructor (GL : WebGL2RenderingContext, obstaclesprogram : ShaderProgram, obstaclesmesh : Mesh, scoresManager : ScoreManager, barrelTexture : WebGLTexture, locations : number[][], distanceBetweenObstacles : number)
     {

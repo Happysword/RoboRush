@@ -33,79 +33,24 @@ export default class Road {
 
         this.roadProgram.use();
 
-        // Start of first plane //
-        this.roadProgram.setUniformMatrix4fv("MVP", false, this.roadMat);
-        this.roadProgram.setUniformMatrix4fv("VP", false, this.vp);
-        this.roadProgram.setUniform3f('cam_position' , cameraPos);
-        this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
+        //Draw First Planes For the Player to be on
+        for (let i = 0 ; i < 5 ; i++)
+        {
+            this.roadProgram.setUniformMatrix4fv("MVP", false, this.roadMat);
+            this.roadProgram.setUniformMatrix4fv("VP", false, this.vp);
+            this.roadProgram.setUniform3f('cam_position' , cameraPos);
+            this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
+            this.gl.bindTexture(this.gl.TEXTURE_2D, this.roadTexture);
+            this.roadProgram.setUniform1i('texture_sampler', 0);
 
-        //this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.roadTexture);
-        this.roadProgram.setUniform1i('texture_sampler', 0);
+            this.roadMesh.draw(this.gl.TRIANGLES);
+        }
 
-        this.roadMesh.draw(this.gl.TRIANGLES);
-
-        // Start of second plane //
-        mat4.translate(this.roadMat , this.roadMat , [2,0,0]);                     // increment x by 2 (distance between 2 planes)
-
-        this.roadProgram.setUniformMatrix4fv("MVP", false, this.roadMat);
-        this.roadProgram.setUniformMatrix4fv("VP", false, this.vp);
-        this.roadProgram.setUniform3f('cam_position' , cameraPos);
-        this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
-
-        //this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.roadTexture);
-        this.roadProgram.setUniform1i('texture_sampler', 0);
-
-        this.roadMesh.draw(this.gl.TRIANGLES);
-
-        // Start of third plane //
-        mat4.translate(this.roadMat , this.roadMat , [2,0,0]);                     // increment x by 2 (distance between 2 planes)
-
-        this.roadProgram.setUniformMatrix4fv("MVP", false, this.roadMat);
-        this.roadProgram.setUniformMatrix4fv("VP", false, this.vp);
-        this.roadProgram.setUniform3f('cam_position' , cameraPos);
-        this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
-
-        //this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.roadTexture);
-        this.roadProgram.setUniform1i('texture_sampler', 0);
-
-        this.roadMesh.draw(this.gl.TRIANGLES);
-
-        // Start of forth plane //
-        mat4.translate(this.roadMat , this.roadMat , [2,0,0]);                     // increment x by 2 (distance between 2 planes)
-
-        this.roadProgram.setUniformMatrix4fv("MVP", false, this.roadMat);
-        this.roadProgram.setUniformMatrix4fv("VP", false, this.vp);
-        this.roadProgram.setUniform3f('cam_position' , cameraPos);
-        this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
-
-        //this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.roadTexture);
-        this.roadProgram.setUniform1i('texture_sampler', 0);
-
-        this.roadMesh.draw(this.gl.TRIANGLES);
-
-        // Start of fifth plane //
-        mat4.translate(this.roadMat , this.roadMat , [2,0,0]);                     // increment x by 2 (distance between 2 planes)
-
-        this.roadProgram.setUniformMatrix4fv("MVP", false, this.roadMat);
-        this.roadProgram.setUniformMatrix4fv("VP", false, this.vp);
-        this.roadProgram.setUniform3f('cam_position' , cameraPos);
-        this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
-
-        //this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.roadTexture);
-        this.roadProgram.setUniform1i('texture_sampler', 0);
-
-        this.roadMesh.draw(this.gl.TRIANGLES);
-
-        this.DrawRoadAfterTime(this.roadMat , numOfPlanes , cameraPos);
+        this.DrawRoadRestOfRoad(this.roadMat , numOfPlanes , cameraPos);
 
     }
 
-    public DrawRoadAfterTime(roadMat :mat4 , numOfPlanes : number ,cameraPos : vec3 )
+    public DrawRoadRestOfRoad(roadMat :mat4 , numOfPlanes : number ,cameraPos : vec3 )
     {
 
         for(let i = 0 ; i < numOfPlanes ; i++)
@@ -126,16 +71,4 @@ export default class Road {
 
     }
 
-    public CheckRoadTimePassed(passedTime: number)
-    {
-        if(this.roadTimer > passedTime)
-        {
-            this.roadTimer = 0;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
 }

@@ -1,26 +1,11 @@
 #version 300 es
 precision highp float;
 
-struct Material {
-    sampler2D diffuse;
-    sampler2D specular;    
-    float shininess;
-}; 
-
-struct Light {
-    vec3 direction;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};
-
 in vec4 v_color;
 in vec2 v_texcoord;
 in vec3 v_normal;
 in vec3 v_FragPos;
 in vec3 v_view;
-in vec3 v_world;
-
 
 out vec4 color;
 

@@ -57,7 +57,6 @@ export default class Player {
         {
             this.jumpduration = 0.6;
             this.jumpduration = this.jumpduration - (this.time /200);
-            console.log(this.time);
         }
 
         this.PlayerBodyMat = mat4.clone(VP);

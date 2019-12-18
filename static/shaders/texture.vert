@@ -14,7 +14,6 @@ uniform mat4 MVP;
 uniform mat4 VP;
 uniform vec3 cam_position;
 
-
 void main(){
     gl_Position = MVP * vec4(position, 1.0f); 
     v_color = color;
@@ -23,5 +22,5 @@ void main(){
     mat4 Model_inverse_transpose = mat4(transpose(inverse(Model)));
     v_normal = (Model_inverse_transpose * vec4(normal, 0.0f)).xyz;
     v_FragPos = vec3(Model * vec4(position, 1.0f));
-    v_view = (Model * vec4(position, 1.0f)).xyz - cam_position;
+    v_view = cam_position - v_FragPos;
 }

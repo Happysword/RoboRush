@@ -28,12 +28,10 @@ var sound = new Howl({
 
 export default class MainGame extends Scene {
     
+    textureProgram : ShaderProgram;
     roadProgram: ShaderProgram;
     playerBodyprogram: ShaderProgram;
     playerHeadprogram: ShaderProgram;
-    coinsprogram: ShaderProgram;
-    obstaclesprogram : ShaderProgram;
-    spikesprogram : ShaderProgram;
     skyBoxProgram : ShaderProgram;
     samplerCubeMap: WebGLSampler;
     time: number = 0;
@@ -61,12 +59,8 @@ export default class MainGame extends Scene {
 
     public load(): void {
         this.game.loader.load({
-            ["spikes.vert"]:{url:'shaders/spikes.vert', type:'text'},
-            ["spikes.frag"]:{url:'shaders/spikes.frag', type:'text'},
-            ["wrench.vert"]:{url:'shaders/wrench.vert', type:'text'},
-            ["wrench.frag"]:{url:'shaders/wrench.frag', type:'text'},
-            ["barrel.vert"]:{url:'shaders/barrel.vert', type:'text'},
-            ["barrel.frag"]:{url:'shaders/barrel.frag', type:'text'},
+            ["texture.vert"]:{url:'shaders/texture.vert', type:'text'},
+            ["texture.frag"]:{url:'shaders/texture.frag', type:'text'},
             ["RoboBody.vert"]:{url:'shaders/RoboBody.vert', type:'text'},
             ["RoboBody.frag"]:{url:'shaders/RoboBody.frag', type:'text'},
             ["RoboHead.vert"]:{url:'shaders/RoboHead.vert', type:'text'},
@@ -93,12 +87,19 @@ export default class MainGame extends Scene {
     } 
     
     public start(): void {
+
+        /*******************************  Load Files *******************************/
         
         this.ifm = new inputFileManager(this.game.loader.resources["inputFile.txt"]);
         this.obstaclesArray = this.ifm.getArray();
         
         /*******************************  Initializing all the Programs *******************************/
         
+        this.textureProgram = new ShaderProgram(this.gl);
+        this.textureProgram.attach(this.game.loader.resources["texture.vert"], this.gl.VERTEX_SHADER);
+        this.textureProgram.attach(this.game.loader.resources["texture.frag"], this.gl.FRAGMENT_SHADER);
+        this.textureProgram.link();
+
         this.roadProgram = new ShaderProgram(this.gl);
         this.roadProgram.attach(this.game.loader.resources["Road.vert"], this.gl.VERTEX_SHADER);
         this.roadProgram.attach(this.game.loader.resources["Road.frag"], this.gl.FRAGMENT_SHADER);
@@ -113,21 +114,6 @@ export default class MainGame extends Scene {
         this.playerHeadprogram.attach(this.game.loader.resources["RoboHead.vert"], this.gl.VERTEX_SHADER);
         this.playerHeadprogram.attach(this.game.loader.resources["RoboHead.frag"], this.gl.FRAGMENT_SHADER);
         this.playerHeadprogram.link();
-
-        this.coinsprogram = new ShaderProgram(this.gl);
-        this.coinsprogram.attach(this.game.loader.resources["wrench.vert"], this.gl.VERTEX_SHADER);
-        this.coinsprogram.attach(this.game.loader.resources["wrench.frag"], this.gl.FRAGMENT_SHADER);
-        this.coinsprogram.link();
-
-        this.obstaclesprogram = new ShaderProgram(this.gl);
-        this.obstaclesprogram.attach(this.game.loader.resources["barrel.vert"], this.gl.VERTEX_SHADER);
-        this.obstaclesprogram.attach(this.game.loader.resources["barrel.frag"], this.gl.FRAGMENT_SHADER);
-        this.obstaclesprogram.link();
-
-        this.spikesprogram = new ShaderProgram(this.gl);
-        this.spikesprogram.attach(this.game.loader.resources["spikes.vert"], this.gl.VERTEX_SHADER);
-        this.spikesprogram.attach(this.game.loader.resources["spikes.frag"], this.gl.FRAGMENT_SHADER);
-        this.spikesprogram.link();
 
         this.skyBoxProgram = new ShaderProgram(this.gl);
         this.skyBoxProgram.attach(this.game.loader.resources["skybox.vert"], this.gl.VERTEX_SHADER);
@@ -144,7 +130,6 @@ export default class MainGame extends Scene {
             this.gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
             this.gl.TEXTURE_CUBE_MAP_POSITIVE_Z
         ]
-
         
         /*******************************  Initializing all the models *******************************/
         
@@ -195,9 +180,9 @@ export default class MainGame extends Scene {
         // Just loading any positions for coins now but later should be loaded from file ?
         // for now just put coins everywhere
         
-        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['wrench'], this.scoremanager, this.player , this.textures['wrench'], this.obstaclesArray, this.distanceBetweenObstacles);
-        this.obstacles = new Obstacles(this.gl, this.obstaclesprogram, this.meshes['barrel'], this.scoremanager , this.textures['barrel'], this.obstaclesArray, this.distanceBetweenObstacles);
-        this.spikes = new Spikes(this.gl, this.spikesprogram, this.meshes['spikes'], this.scoremanager, this.player , this.textures['spikes'], this.obstaclesArray, this.distanceBetweenObstacles);
+        this.spikes = new Spikes(this.gl, this.textureProgram, this.meshes['spikes'], this.scoremanager, this.player , this.textures['spikes'], this.obstaclesArray, this.distanceBetweenObstacles);
+        this.coins = new Coins(this.gl, this.textureProgram, this.meshes['wrench'], this.scoremanager, this.player , this.textures['wrench'], this.obstaclesArray, this.distanceBetweenObstacles);
+        this.obstacles = new Obstacles(this.gl, this.textureProgram, this.meshes['barrel'], this.scoremanager , this.textures['barrel'], this.obstaclesArray, this.distanceBetweenObstacles);
         
         /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
         
@@ -228,13 +213,11 @@ export default class MainGame extends Scene {
         {
             this.time += deltaTime / 1000;             // Time in seconds we use delta time to be consitant on all computers 
         }
-        
-        this.controller.update(deltaTime); //Only For testing purposes (will be removed) , it update control camera with mouse
-        
+                
         this.skyBox = new SkyBox(this.gl , this.skyBoxProgram , this.samplerCubeMap , this.meshes['cubeMapMesh'] , this.textures['environment']);
         this.skyBox.drawSkyBox(this.camera); //Draw The SkyBox
         
-        this.road = new Road(VP , this.roadProgram ,  this.textures['road'] ,this.meshes['road'] , this.gl , deltaTime );
+        this.road = new Road(VP , this.roadProgram ,  this.textures['road'] ,this.meshes['road'] , this.gl , deltaTime);
         
         this.road.drawRoad(500 , this.camera.position);      // Draws Infinite Plane With X planes to be repeated
         
@@ -249,16 +232,13 @@ export default class MainGame extends Scene {
         this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset);
         this.spikes.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset);
 
-        // LOLO: Here should draw score ? 
-        //SASA: NO not here but DOLA will do it by html and css
-              
-        //DOLA: /*The SCOREBOARD */
         this.ctx.font = "55px Star Jedi";
         this.ctx.fillStyle = "yellow";
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.ctx.textAlign = "center";
         this.ctx.fillText("SCoRE " + (this.scoremanager.Score + Math.floor( this.time * 2 )), this.ctx.canvas.width/2, 50);
         this.scoreStaticCounter = 0;
+
     }
     
     public end(): void {

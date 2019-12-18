@@ -16,7 +16,7 @@ window.addEventListener('load', function ()     /*the game won't start till the 
 
     function startGame()
     {
-        const game = new Game(canvas, overCanvas);
+        const game = new Game(canvas , overCanvas);
 
         // Here we list all our scenes and our initial scene
         const scenes = {

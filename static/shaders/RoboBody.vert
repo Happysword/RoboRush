@@ -15,7 +15,6 @@ uniform mat4 MVP;
 uniform mat4 VP;
 uniform vec3 cam_position;
 
-
 void main(){
     gl_Position = MVP * vec4(position, 1.0f); 
     v_color = color;
