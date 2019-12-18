@@ -52,8 +52,10 @@ export default class MainGame extends Scene {
     skyBox : SkyBox;
     ifm : inputFileManager;
     obstaclesArray: number[][];
-    obstaclesOffset : number = 20; // where obstacles start from
     scoreStaticCounter: number = 0;
+    // Variables to decide obstacles in scene
+    obstaclesOffset : number = 20; // where obstacles start from
+    distanceBetweenObstacles : number = 10; // distance between obstacles rows in scene
 
     static readonly cubemapDirections = ['negx', 'negy', 'negz', 'posx', 'posy', 'posz']
 
@@ -193,9 +195,9 @@ export default class MainGame extends Scene {
         // Just loading any positions for coins now but later should be loaded from file ?
         // for now just put coins everywhere
         
-        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['wrench'], this.scoremanager, this.player , this.textures['wrench'], this.obstaclesArray);
-        this.obstacles = new Obstacles(this.gl, this.obstaclesprogram, this.meshes['barrel'], this.scoremanager , this.textures['barrel'], this.obstaclesArray);
-        this.spikes = new Spikes(this.gl, this.spikesprogram, this.meshes['spikes'], this.scoremanager, this.player , this.textures['spikes'], this.obstaclesArray);
+        this.coins = new Coins(this.gl, this.coinsprogram, this.meshes['wrench'], this.scoremanager, this.player , this.textures['wrench'], this.obstaclesArray, this.distanceBetweenObstacles);
+        this.obstacles = new Obstacles(this.gl, this.obstaclesprogram, this.meshes['barrel'], this.scoremanager , this.textures['barrel'], this.obstaclesArray, this.distanceBetweenObstacles);
+        this.spikes = new Spikes(this.gl, this.spikesprogram, this.meshes['spikes'], this.scoremanager, this.player , this.textures['spikes'], this.obstaclesArray, this.distanceBetweenObstacles);
         
         /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
         

@@ -17,8 +17,9 @@ export default class Coins extends Collider {
     previousHitsTime : number[];
     scoremanager : ScoreManager;
     obstaclesLocations: number[][];
+    distanceBetweenObstacles : number;
 
-    public constructor (GL : WebGL2RenderingContext, coinsprogram : ShaderProgram, coinsmesh : Mesh, scoresManager : ScoreManager, playerinst : Player , wrenchTexture : WebGLTexture, locations : number[][])
+    public constructor (GL : WebGL2RenderingContext, coinsprogram : ShaderProgram, coinsmesh : Mesh, scoresManager : ScoreManager, playerinst : Player , wrenchTexture : WebGLTexture, locations : number[][], distanceBetweenObstacles : number)
     {
         super(GL);
         this.CoinsProgram = coinsprogram;
@@ -30,6 +31,7 @@ export default class Coins extends Collider {
         this.player = playerinst;
         this.CoinsTexture = wrenchTexture;
         this.obstaclesLocations = locations;
+        this.distanceBetweenObstacles = distanceBetweenObstacles;
     }
     
     public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number, offset : number)
@@ -50,7 +52,7 @@ export default class Coins extends Collider {
             {
                 if (this.obstaclesLocations[i][j] == 1)  // coins code is 1
                 {
-                    this.drawCoin(j, offset + (i * 10), playerPos, cameraPos, time);     // distance between each obstacles is 10
+                    this.drawCoin(j, offset + (i * this.distanceBetweenObstacles), playerPos, cameraPos, time);     // distance between each obstacles is this.distanceBetweenObstacles
                 }
             }
         }

@@ -17,8 +17,9 @@ export default class Spikes extends Collider {
     previousHitsTime : number[];
     scoremanager : ScoreManager;
     obstaclesLocations: number[][];
+    distanceBetweenObstacles : number;
     
-    public constructor (GL : WebGL2RenderingContext, spikeprogram : ShaderProgram, spikemesh : Mesh, scoresManager : ScoreManager, playerinst : Player , spikeTexture : WebGLTexture, locations : number[][])
+    public constructor (GL : WebGL2RenderingContext, spikeprogram : ShaderProgram, spikemesh : Mesh, scoresManager : ScoreManager, playerinst : Player , spikeTexture : WebGLTexture, locations : number[][], distanceBetweenObstacles : number)
     {
         super(GL);
         this.SpikesProgram = spikeprogram;
@@ -30,6 +31,7 @@ export default class Spikes extends Collider {
         this.player = playerinst;
         this.SpikesTexture = spikeTexture;
         this.obstaclesLocations = locations;
+        this.distanceBetweenObstacles = distanceBetweenObstacles;
     }
 
     public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number, offset : number)
@@ -50,7 +52,7 @@ export default class Spikes extends Collider {
             {
                 if (this.obstaclesLocations[i][j] == 2)  // spikes code is 2
                 {
-                    this.drawSpike(j, offset + (i * 10), playerPos, cameraPos, time);     // distance between each obstacles is 10
+                    this.drawSpike(j, offset + (i * this.distanceBetweenObstacles), playerPos, cameraPos, time);     // distance between each obstacles is this.distanceBetweenObstacles
                 }
             }
         }

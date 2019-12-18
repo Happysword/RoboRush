@@ -15,8 +15,9 @@ export default class Obstacles extends Collider {
     previousHitsTime : number[];
     scoremanager : ScoreManager;
     obstaclesLocations: number[][];
+    distanceBetweenObstacles : number;
     
-    public constructor (GL : WebGL2RenderingContext, obstaclesprogram : ShaderProgram, obstaclesmesh : Mesh, scoresManager : ScoreManager, barrelTexture : WebGLTexture, locations : number[][])
+    public constructor (GL : WebGL2RenderingContext, obstaclesprogram : ShaderProgram, obstaclesmesh : Mesh, scoresManager : ScoreManager, barrelTexture : WebGLTexture, locations : number[][], distanceBetweenObstacles : number)
     {
         super(GL);
         this.ObstaclesProgram = obstaclesprogram;
@@ -27,6 +28,7 @@ export default class Obstacles extends Collider {
         this.scoremanager = scoresManager;
         this.ObstaclesTexture = barrelTexture;
         this.obstaclesLocations = locations;
+        this.distanceBetweenObstacles = distanceBetweenObstacles;
     }
     
     public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number, offset : number)
@@ -47,7 +49,7 @@ export default class Obstacles extends Collider {
             {
                 if (this.obstaclesLocations[i][j] == 3)  // obstacle code is 3
                 {
-                    this.drawObstacle(j, offset + (i * 10), playerPos, cameraPos, time);     // distance between each obstacles is 10
+                    this.drawObstacle(j, offset + (i * this.distanceBetweenObstacles), playerPos, cameraPos, time);     // distance between each obstacles is this.distanceBetweenObstacles
                 }
             }
         }
