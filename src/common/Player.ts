@@ -74,7 +74,7 @@ export default class Player {
             this.setPlayerDirection();
             this.setPlayerJump(this.time);
         }
-        this.MovePlayerDirection();
+        this.MovePlayerDirection(isLost);
         this.MovePlayerJump(this.time);
         
         
@@ -106,7 +106,7 @@ export default class Player {
         this.gl.bindTexture(this.gl.TEXTURE_2D , this.roboHeadTexture);
         this.PlayerHeadProgram.setUniform1i('texture_sampler', 0);
 
-        this.MovePlayerHeadDirection();
+        this.MovePlayerHeadDirection(isLost);
         this.MovePlayerHeadJump(this.time);
 
         
@@ -191,11 +191,17 @@ export default class Player {
 
     }
 
-    private MovePlayerDirection()
+    private MovePlayerDirection(isLost:Boolean)
     {
         mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[0,0,2])
 
-        if(this.playerdirection == 0 && this.playerposition == 1)
+        if(isLost)
+        {
+            this.playerdirection = 0;
+            mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[this.xposition,0,0]);
+        }
+
+       else  if(this.playerdirection == 0 && this.playerposition == 1)
         {
             this.xposition = 0;
             mat4.translate(this.PlayerBodyMat,this.PlayerBodyMat,[this.xposition,0,0]);
@@ -236,11 +242,17 @@ export default class Player {
 
     }
 
-    private MovePlayerHeadDirection()
+    private MovePlayerHeadDirection(isLost:Boolean)
     {
         mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[0,0,2]) //for the head
 
-        if(this.playerdirection == 1 && this.playerposition == 1)//from middle to left working
+        if(isLost)
+        {
+            this.playerdirection = 0;
+            mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[this.xposition,0,0]);
+        }
+
+        else if(this.playerdirection == 1 && this.playerposition == 1)//from middle to left working
         {
             mat4.translate(this.PlayerHeadMat,this.PlayerHeadMat,[this.xposition,0,0])  //head
             if(this.xposition < this.maxlanedisp ) this.xposition += this.speedofsliding;
