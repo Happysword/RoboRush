@@ -25,7 +25,7 @@ export default class SkyBox {
     public drawSkyBox(camera : Camera)
     {
         this.gl.cullFace(this.gl.FRONT);
-        this.gl.depthMask(false);
+        this.gl.depthMask(false);   //A GLboolean specifying whether or not writing into the depth buffer is enabled
 
         this.skyBoxProgram.use();
 
@@ -37,11 +37,6 @@ export default class SkyBox {
         this.skyBoxProgram.setUniformMatrix4fv("M", false, this.skyMat);
 
         this.skyBoxProgram.setUniform4f("tint", [1, 1, 1, 1]);
-
-        /*this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(this.gl.TEXTURE_CUBE_MAP, this.skyBoxTexture);
-        this.skyBoxProgram.setUniform1i('cube_texture_sampler', 0);
-        this.gl.bindSampler(0, this.samplerCubeMap);*/
 
         this.cubeMapMesh.draw(this.gl.TRIANGLES);
         
