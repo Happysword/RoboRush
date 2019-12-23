@@ -4,7 +4,7 @@ import Mesh from '../common/mesh';
 import * as MeshUtils from '../common/mesh-utils';
 import * as TextureUtils from '../common/texture-utils';
 import Camera from '../common/camera';
-import { vec2, vec3, mat4 } from 'gl-matrix';
+import { vec2, vec3, mat4, vec4 } from 'gl-matrix';
 import { Vector, Selector } from '../common/dom-utils';
 import { createElement, StatelessProps, StatelessComponent } from 'tsx-create-element';
 import Road from '../common/road';
@@ -52,7 +52,8 @@ export default class MainGame extends Scene {
     // Variables to decide obstacles in scene
     obstaclesOffset : number = 20; // where obstacles start from
     distanceBetweenObstacles : number = 10; // distance between obstacles rows in scene
-
+    loseCount: number = 0;
+    lightDir:vec3;
     static readonly cubemapDirections = ['negx', 'negy', 'negz', 'posx', 'posy', 'posz']
 
     public load(): void {
@@ -91,6 +92,7 @@ export default class MainGame extends Scene {
         this.ifm = new inputFileManager(this.game.loader.resources["inputFile.txt"]);
         this.obstaclesArray = this.ifm.getArray();
         this.distanceBetweenObstacles = this.ifm.getObstaclesDistance();
+        this.lightDir = this.ifm.getLightDir();
         /*******************************  Initializing all the Programs *******************************/
         
         this.textureProgram = new ShaderProgram(this.gl);
@@ -212,6 +214,25 @@ export default class MainGame extends Scene {
         {
             this.camera.Move(130 , 0.05 + (this.time/1000) , this.camera, this.ifm);  // Makes camera Move until distance X (calculated from origin) with speed Y
         }
+        else
+        {
+            this.ctx.font = "70px Star Jedi";
+            this.ctx.fillStyle = "yellow";
+            this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+            this.ctx.textAlign = "center";
+            this.ctx.fillText("GAME ovER!", this.ctx.canvas.width/2, this.ctx.canvas.height/2);
+            this.ctx.font = "40px Star Jedi";
+            this.ctx.fillStyle = "yellow";
+            this.ctx.textAlign = "center";
+            this.ctx.fillText("Back to main menu...", this.ctx.canvas.width/2, this.ctx.canvas.height/1.5);
+            
+            this.scoreStaticCounter = 0;
+            this.loseCount++;
+            if(this.loseCount >= 200)
+            {
+                window.location.href = "mainmenu.html";
+            }
+        }
         
         this.player.Draw(VP,this.camera.getposition(), deltaTime , this.scoremanager.Lose , lightDir);
         
@@ -224,7 +245,10 @@ export default class MainGame extends Scene {
 
         this.ctx.font = "55px Star Jedi";
         this.ctx.fillStyle = "yellow";
+        if(!this.scoremanager.Lose)
+        {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        }
         this.ctx.textAlign = "center";
         this.ctx.fillText("SCoRE " + (this.scoremanager.Score + Math.floor( this.time * 2 )), this.ctx.canvas.width/2, 50);
         this.scoreStaticCounter = 0;

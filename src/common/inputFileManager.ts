@@ -1,25 +1,35 @@
+import { vec3 } from "gl-matrix";
+
 export default  class InputFileManager {
     private fileString:string;
     private collisionObjects: number[][];
     private distanceBetweenObstacles: number;
+    private lightDir: vec3;
     public constructor(fs: string)
     {
         this.fileString = fs;
         this.collisionObjects = new Array();
+        this.lightDir = vec3.create();
         this.load2DArray();
     }
     private load2DArray()
     {
         let rowsArr  = this.fileString.split("\n");              /*Splits the file string into array of strings. Each string contains a row*/
+        let lightDirValues = rowsArr[0].split(" ");
+        this.lightDir[0] = Number(lightDirValues[0]);
+        this.lightDir[1] = Number(lightDirValues[1]);
+        this.lightDir[2] = Number(lightDirValues[2]);
+
+
         let row_counter = 0;
-        this.distanceBetweenObstacles = Number(rowsArr[0]);
+        this.distanceBetweenObstacles = Number(rowsArr[1]);
         if(this.distanceBetweenObstacles < 5 || this.distanceBetweenObstacles > 20)
         {
             this.distanceBetweenObstacles = 10; //default value
         }
         rowsArr.forEach( row =>
         {
-            if(row != rowsArr[0])
+            if(row != rowsArr[0] && row != rowsArr[1])
             {
                 this.collisionObjects[row_counter] = new Array();
                 let col = row.split(" ");                              /*Splits the row string into array of strings. Each string contains a number*/
@@ -54,6 +64,10 @@ export default  class InputFileManager {
     public getObstaclesDistance():number
     {
         return this.distanceBetweenObstacles;
+    }
+    public getLightDir():vec3
+    {
+        return this.lightDir;
     }
     // public getObstaclesType1(): number[]
     // {
