@@ -4,7 +4,7 @@ import Mesh from '../common/mesh';
 import * as MeshUtils from '../common/mesh-utils';
 import * as TextureUtils from '../common/texture-utils';
 import Camera from '../common/camera';
-import { vec2, vec3, mat4 } from 'gl-matrix';
+import { vec2, vec3, mat4, vec4 } from 'gl-matrix';
 import { Vector, Selector } from '../common/dom-utils';
 import { createElement, StatelessProps, StatelessComponent } from 'tsx-create-element';
 import Road from '../common/road';
@@ -52,7 +52,8 @@ export default class MainGame extends Scene {
     // Variables to decide obstacles in scene
     obstaclesOffset : number = 20; // where obstacles start from
     distanceBetweenObstacles : number = 10; // distance between obstacles rows in scene
-
+    loseCount: number = 0;
+    lightDir:vec3;
     static readonly cubemapDirections = ['negx', 'negy', 'negz', 'posx', 'posy', 'posz']
 
     public load(): void {
@@ -91,6 +92,8 @@ export default class MainGame extends Scene {
         this.ifm = new inputFileManager(this.game.loader.resources["inputFile.txt"]);
         this.obstaclesArray = this.ifm.getArray();
         this.distanceBetweenObstacles = this.ifm.getObstaclesDistance();
+        this.lightDir = this.ifm.getLightDir();
+        console.log(this.lightDir[0]);
         /*******************************  Initializing all the Programs *******************************/
         
         this.textureProgram = new ShaderProgram(this.gl);
@@ -206,25 +209,47 @@ export default class MainGame extends Scene {
         
         let lightDir = vec3.fromValues(-0.4,-0.8,0.5);  //Direction of the directional light best values for current scene are vec3(-0.4,-0.8,0.5)
         this.road = new Road(VP , this.roadProgram ,  this.textures['road'] ,this.meshes['road'] , this.gl , deltaTime);
-        this.road.drawRoad(500 , this.camera.position , lightDir);      // Draws Infinite Plane With X planes to be repeated
+        this.road.drawRoad(500 , this.camera.position , this.lightDir);      // Draws Infinite Plane With X planes to be repeated
         
         if(!this.scoremanager.Lose)
         {
             this.camera.Move(20 + this.obstaclesArray.length * this.distanceBetweenObstacles , 0.05 + (this.time/1000) , this.camera, this.ifm);  // Makes camera Move until distance X (calculated from origin) with speed Y
         }
-
-        this.player.Draw(VP,this.camera.getposition(), deltaTime , this.scoremanager.Lose , lightDir);
+        else
+        {
+            this.ctx.font = "70px Star Jedi";
+            this.ctx.fillStyle = "yellow";
+            this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+            this.ctx.textAlign = "center";
+            this.ctx.fillText("GAME ovER!", this.ctx.canvas.width/2, this.ctx.canvas.height/2);
+            this.ctx.font = "40px Star Jedi";
+            this.ctx.fillStyle = "yellow";
+            this.ctx.textAlign = "center";
+            this.ctx.fillText("Back to main menu...", this.ctx.canvas.width/2, this.ctx.canvas.height/1.5);
+            
+            this.scoreStaticCounter = 0;
+            this.loseCount++;
+            if(this.loseCount >= 200)
+            {
+                window.location.href = "mainmenu.html";
+            }
+        }
         
-        this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , lightDir);
-        this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , lightDir);
-        this.spikes.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , lightDir);
+        this.player.Draw(VP,this.camera.getposition(), deltaTime , this.scoremanager.Lose , this.lightDir);
+        
+        this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , this.lightDir);
+        this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , this.lightDir);
+        this.spikes.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , this.lightDir);
         
         this.skyBox = new SkyBox(this.gl , this.skyBoxProgram , this.samplerCubeMap , this.meshes['cubeMapMesh'] , this.textures['environment']);
         this.skyBox.drawSkyBox(this.camera); //Draw The SkyBox
 
         this.ctx.font = "55px Star Jedi";
         this.ctx.fillStyle = "yellow";
+        if(!this.scoremanager.Lose)
+        {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        }
         this.ctx.textAlign = "center";
         this.ctx.fillText("SCoRE " + (this.scoremanager.Score + Math.floor( this.time * 2 )), this.ctx.canvas.width/2, 50);
         this.scoreStaticCounter = 0;

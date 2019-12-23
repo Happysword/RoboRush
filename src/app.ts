@@ -7,12 +7,13 @@ import MainGame from './scenes/MainGame';
 
 // Then we create an instance of the game class and give it the canvas
 
-window.addEventListener('load', function ()     /*the game won't start till the window is loaded (the window contains the document which contains both canvas elements) */
+/*the game won't start till the window is loaded (the window contains the document which contains both canvas elements) */
+window.addEventListener('load', function ()     
 {
     const canvas: HTMLCanvasElement = document.querySelector("#app");
     const overCanvas: HTMLCanvasElement = document.querySelector("#overCanvas");
  
-    (document as any).fonts.load('20px Russo One').then(startGame());   /*wait till the fonts file loads*/
+    (document as any).fonts.load('55px Star Jedi').then(startGame());   /*wait till the fonts file loads*/
 
     function startGame()
     {
