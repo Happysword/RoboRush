@@ -59,10 +59,9 @@ export default class Road {
                 
             this.roadProgram.setUniformMatrix4fv("MVP", false, roadMat);
             this.roadProgram.setUniformMatrix4fv("VP", false, this.vp);
-          this.roadProgram.setUniform3f('cam_position' , cameraPos);
+            this.roadProgram.setUniform3f('cam_position' , cameraPos);
             this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
-                
-            //this.gl.activeTexture(this.gl.TEXTURE0);
+
             this.gl.bindTexture(this.gl.TEXTURE_2D, this.roadTexture);
             this.roadProgram.setUniform1i('texture_sampler', 0);
                 

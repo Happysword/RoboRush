@@ -38,7 +38,6 @@ export default class MainGame extends Scene {
     meshes: {[name: string]: Mesh} = {};
     textures: {[name: string]: WebGLTexture} = {};
     camera: Camera;
-    controller: FlyCameraController;
     player :Player
     playerMat: mat4
     roadMat : mat4;
@@ -139,8 +138,6 @@ export default class MainGame extends Scene {
         this.meshes['spikes'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["spikesMesh"]);
         this.meshes['wrench'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["wrenchMesh"]);
         this.meshes['barrel'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["barrelMesh"]);
-        this.meshes['coin'] = MeshUtils.Sphere(this.gl);
-        this.meshes['obstacle'] = MeshUtils.Sphere(this.gl);
         this.meshes['cubeMapMesh'] = MeshUtils.Cube(this.gl);
         
         /*******************************  Initializing all the textures *******************************/
@@ -159,10 +156,6 @@ export default class MainGame extends Scene {
             this.gl.texImage2D(target_directions[i], 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.game.loader.resources[MainGame.cubemapDirections[i]]);
         }
         this.gl.generateMipmap(this.gl.TEXTURE_CUBE_MAP);
-        
-        this.samplerCubeMap = this.gl.createSampler();
-        this.gl.samplerParameteri(this.samplerCubeMap, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.samplerParameteri(this.samplerCubeMap, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
         
         /*******************************  Initializing the Camera *******************************/
         
@@ -183,12 +176,8 @@ export default class MainGame extends Scene {
         this.spikes = new Spikes(this.gl, this.textureProgram, this.meshes['spikes'], this.scoremanager, this.player , this.textures['spikes'], this.obstaclesArray, this.distanceBetweenObstacles);
         this.coins = new Coins(this.gl, this.textureProgram, this.meshes['wrench'], this.scoremanager, this.player , this.textures['wrench'], this.obstaclesArray, this.distanceBetweenObstacles);
         this.obstacles = new Obstacles(this.gl, this.textureProgram, this.meshes['barrel'], this.scoremanager , this.textures['barrel'], this.obstaclesArray, this.distanceBetweenObstacles);
-        
-        /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
-        
-        this.controller = new FlyCameraController(this.camera, this.game.input);
-        this.controller.movementSensitivity = 0.005;
-        
+    
+
         /*******************************  Clearing Screen With Color *******************************/
         
         this.gl.clearColor(0.1,0.1,0.1,1);
@@ -218,7 +207,6 @@ export default class MainGame extends Scene {
         this.skyBox.drawSkyBox(this.camera); //Draw The SkyBox
         
         this.road = new Road(VP , this.roadProgram ,  this.textures['road'] ,this.meshes['road'] , this.gl , deltaTime);
-        
         this.road.drawRoad(500 , this.camera.position);      // Draws Infinite Plane With X planes to be repeated
         
         if(!this.scoremanager.Lose)
