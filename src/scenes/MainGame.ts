@@ -210,9 +210,9 @@ export default class MainGame extends Scene {
         
         if(!this.scoremanager.Lose)
         {
-            this.camera.Move(130 , 0.05 + (this.time/1000) , this.camera, this.ifm);  // Makes camera Move until distance X (calculated from origin) with speed Y
+            this.camera.Move(20 + this.obstaclesArray.length * this.distanceBetweenObstacles , 0.05 + (this.time/1000) , this.camera, this.ifm);  // Makes camera Move until distance X (calculated from origin) with speed Y
         }
-        
+
         this.player.Draw(VP,this.camera.getposition(), deltaTime , this.scoremanager.Lose , lightDir);
         
         this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , lightDir);
