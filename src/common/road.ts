@@ -27,7 +27,7 @@ export default class Road {
     }
 
 
-    public drawRoad(numOfPlanes : number , cameraPos : vec3)
+    public drawRoad(numOfPlanes : number , cameraPos : vec3 , lightDir : vec3)
     {
         //************  Here we draw 5 planes as a start  ************//
 
@@ -41,16 +41,17 @@ export default class Road {
             this.roadProgram.setUniform3f('cam_position' , cameraPos);
             this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
             this.gl.bindTexture(this.gl.TEXTURE_2D, this.roadTexture);
+            this.roadProgram.setUniform3f('lightDirection' , [lightDir[0],lightDir[1],lightDir[2]]);
             this.roadProgram.setUniform1i('texture_sampler', 0);
 
             this.roadMesh.draw(this.gl.TRIANGLES);
         }
 
-        this.DrawRoadRestOfRoad(this.roadMat , numOfPlanes , cameraPos);
+        this.DrawRoadRestOfRoad(this.roadMat , numOfPlanes , cameraPos , lightDir);
 
     }
 
-    public DrawRoadRestOfRoad(roadMat :mat4 , numOfPlanes : number ,cameraPos : vec3 )
+    public DrawRoadRestOfRoad(roadMat :mat4 , numOfPlanes : number ,cameraPos : vec3 , lightDir : vec3)
     {
 
         for(let i = 0 ; i < numOfPlanes ; i++)
@@ -61,7 +62,7 @@ export default class Road {
             this.roadProgram.setUniformMatrix4fv("VP", false, this.vp);
             this.roadProgram.setUniform3f('cam_position' , cameraPos);
             this.roadProgram.setUniform4f("tint", [1, 1, 1, 1]);
-
+            this.roadProgram.setUniform3f('lightDirection' , [lightDir[0],lightDir[1],lightDir[2]]);
             this.gl.bindTexture(this.gl.TEXTURE_2D, this.roadTexture);
             this.roadProgram.setUniform1i('texture_sampler', 0);
                 

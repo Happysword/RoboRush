@@ -30,7 +30,7 @@ export default class Spikes extends Collider {
         this.distanceBetweenObstacles = distanceBetweenObstacles;
     }
 
-    public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number, offset : number)
+    public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number, offset : number , lightDir : vec3)
     {
         this.SpikesMat = mat4.clone(VP);
         
@@ -39,6 +39,7 @@ export default class Spikes extends Collider {
         this.SpikesProgram.setUniform3f('cam_position' , cameraPos);
         this.SpikesProgram.setUniformMatrix4fv("VP", false, VP);
         this.SpikesProgram.setUniform1i('texture_sampler', 0);
+        this.SpikesProgram.setUniform3f('lightDirection' , [lightDir[0],lightDir[1],lightDir[2]]);
 
         // Draw all obstacles here should put (Lane of obstacle, distance of obstacle, leave the rest as is)
         // Lane of obstacle 0=>left lane, 1=>middle lane, 2=>right lane 

@@ -28,7 +28,7 @@ export default class Obstacles extends Collider {
         this.distanceBetweenObstacles = distanceBetweenObstacles;
     }
     
-    public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number, offset : number)
+    public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number, offset : number , lightDir : vec3)
     {
         this.obstaclesMat = mat4.clone(VP);
         
@@ -36,6 +36,7 @@ export default class Obstacles extends Collider {
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.ObstaclesTexture);
         this.ObstaclesProgram.setUniform1i('texture_sampler', 0);
         this.ObstaclesProgram.setUniform3f('cam_position' , cameraPos);
+        this.ObstaclesProgram.setUniform3f('lightDirection' , [lightDir[0],lightDir[1],lightDir[2]]);
         this.ObstaclesProgram.setUniformMatrix4fv("VP", false, VP);
 
         // Draw all obstacles here should put (Lane of obstacle, distance of obstacle, leave the rest as is)

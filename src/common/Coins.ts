@@ -30,13 +30,14 @@ export default class Coins extends Collider {
         this.distanceBetweenObstacles = distanceBetweenObstacles;
     }
     
-    public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number, offset : number)
+    public Draw (deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number, offset : number , lightDir : vec3)
     {
         this.coinsMat = mat4.clone(VP);
         
         this.CoinsProgram.use();
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.CoinsTexture);
         this.CoinsProgram.setUniform1i('texture_sampler', 0);
+        this.CoinsProgram.setUniform3f('lightDirection' , [lightDir[0],lightDir[1],lightDir[2]]);
         this.CoinsProgram.setUniform3f('cam_position' , cameraPos);
         this.CoinsProgram.setUniformMatrix4fv("VP", false, VP);
 
