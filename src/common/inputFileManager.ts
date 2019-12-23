@@ -23,6 +23,7 @@ export default  class InputFileManager {
 
         let row_counter = 0;
         this.distanceBetweenObstacles = Number(rowsArr[1]);
+
         if(this.distanceBetweenObstacles < 5 || this.distanceBetweenObstacles > 20)
         {
             this.distanceBetweenObstacles = 10; //default value

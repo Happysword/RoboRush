@@ -93,6 +93,7 @@ export default class MainGame extends Scene {
         this.obstaclesArray = this.ifm.getArray();
         this.distanceBetweenObstacles = this.ifm.getObstaclesDistance();
         this.lightDir = this.ifm.getLightDir();
+        console.log(this.lightDir[0]);
         /*******************************  Initializing all the Programs *******************************/
         
         this.textureProgram = new ShaderProgram(this.gl);
@@ -208,7 +209,7 @@ export default class MainGame extends Scene {
         
         let lightDir = vec3.fromValues(-0.4,-0.8,0.5);  //Direction of the directional light best values for current scene are vec3(-0.4,-0.8,0.5)
         this.road = new Road(VP , this.roadProgram ,  this.textures['road'] ,this.meshes['road'] , this.gl , deltaTime);
-        this.road.drawRoad(500 , this.camera.position , lightDir);      // Draws Infinite Plane With X planes to be repeated
+        this.road.drawRoad(500 , this.camera.position , this.lightDir);      // Draws Infinite Plane With X planes to be repeated
         
         if(!this.scoremanager.Lose)
         {
@@ -234,11 +235,11 @@ export default class MainGame extends Scene {
             }
         }
         
-        this.player.Draw(VP,this.camera.getposition(), deltaTime , this.scoremanager.Lose , lightDir);
+        this.player.Draw(VP,this.camera.getposition(), deltaTime , this.scoremanager.Lose , this.lightDir);
         
-        this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , lightDir);
-        this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , lightDir);
-        this.spikes.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , lightDir);
+        this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , this.lightDir);
+        this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , this.lightDir);
+        this.spikes.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , this.lightDir);
         
         this.skyBox = new SkyBox(this.gl , this.skyBoxProgram , this.samplerCubeMap , this.meshes['cubeMapMesh'] , this.textures['environment']);
         this.skyBox.drawSkyBox(this.camera); //Draw The SkyBox
