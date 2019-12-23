@@ -26,17 +26,17 @@ void main(){
     
     // ambient
     vec4 texture_sampler_temp = texture(texture_sampler, v_texcoord);
-    vec3 ambient = lightAmbient * texture_sampler_temp.xyz;
+    vec3 ambient = lightAmbient * texture_sampler_temp.xyz;             //constant ambient factor 
 
     // diffuse 
     vec3 norm = normalize(v_normal);
-    vec3 lightDir = normalize(-lightDirection);  
+    vec3 lightDir = normalize(-lightDirection);  //read from file
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = lightDiffuse * diff;
 
     // specular
     vec3 viewDir = normalize(v_view - v_FragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);  
+    vec3 reflectDir = reflect(-lightDir, norm);  //direction from frag toward light source
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), materialShiniess);
     vec3 specular = lightSpecular * spec;  
 
