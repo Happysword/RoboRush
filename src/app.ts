@@ -12,7 +12,7 @@ window.addEventListener('load', function ()     /*the game won't start till the 
     const canvas: HTMLCanvasElement = document.querySelector("#app");
     const overCanvas: HTMLCanvasElement = document.querySelector("#overCanvas");
  
-    (document as any).fonts.load('20px Russo One').then(startGame());   /*wait till the fonts file loads*/
+    (document as any).fonts.load('55px Star Jedi').then(startGame());   /*wait till the fonts file loads*/
 
     function startGame()
     {
