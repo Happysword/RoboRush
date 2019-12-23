@@ -4,7 +4,6 @@ import Mesh from '../common/mesh';
 import * as MeshUtils from '../common/mesh-utils';
 import * as TextureUtils from '../common/texture-utils';
 import Camera from '../common/camera';
-import FlyCameraController from '../common/camera-controllers/fly-camera-controller';
 import { vec2, vec3, mat4 } from 'gl-matrix';
 import { Vector, Selector } from '../common/dom-utils';
 import { createElement, StatelessProps, StatelessComponent } from 'tsx-create-element';
@@ -38,7 +37,6 @@ export default class MainGame extends Scene {
     meshes: {[name: string]: Mesh} = {};
     textures: {[name: string]: WebGLTexture} = {};
     camera: Camera;
-    controller: FlyCameraController;
     player :Player
     playerMat: mat4
     roadMat : mat4;
@@ -92,7 +90,7 @@ export default class MainGame extends Scene {
         
         this.ifm = new inputFileManager(this.game.loader.resources["inputFile.txt"]);
         this.obstaclesArray = this.ifm.getArray();
-        
+        this.distanceBetweenObstacles = this.ifm.getObstaclesDistance();
         /*******************************  Initializing all the Programs *******************************/
         
         this.textureProgram = new ShaderProgram(this.gl);
@@ -139,8 +137,6 @@ export default class MainGame extends Scene {
         this.meshes['spikes'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["spikesMesh"]);
         this.meshes['wrench'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["wrenchMesh"]);
         this.meshes['barrel'] = MeshUtils.LoadOBJMesh(this.gl, this.game.loader.resources["barrelMesh"]);
-        this.meshes['coin'] = MeshUtils.Sphere(this.gl);
-        this.meshes['obstacle'] = MeshUtils.Sphere(this.gl);
         this.meshes['cubeMapMesh'] = MeshUtils.Cube(this.gl);
         
         /*******************************  Initializing all the textures *******************************/
@@ -159,10 +155,6 @@ export default class MainGame extends Scene {
             this.gl.texImage2D(target_directions[i], 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.game.loader.resources[MainGame.cubemapDirections[i]]);
         }
         this.gl.generateMipmap(this.gl.TEXTURE_CUBE_MAP);
-        
-        this.samplerCubeMap = this.gl.createSampler();
-        this.gl.samplerParameteri(this.samplerCubeMap, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.samplerParameteri(this.samplerCubeMap, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
         
         /*******************************  Initializing the Camera *******************************/
         
@@ -183,12 +175,8 @@ export default class MainGame extends Scene {
         this.spikes = new Spikes(this.gl, this.textureProgram, this.meshes['spikes'], this.scoremanager, this.player , this.textures['spikes'], this.obstaclesArray, this.distanceBetweenObstacles);
         this.coins = new Coins(this.gl, this.textureProgram, this.meshes['wrench'], this.scoremanager, this.player , this.textures['wrench'], this.obstaclesArray, this.distanceBetweenObstacles);
         this.obstacles = new Obstacles(this.gl, this.textureProgram, this.meshes['barrel'], this.scoremanager , this.textures['barrel'], this.obstaclesArray, this.distanceBetweenObstacles);
-        
-        /*******************************  Initializing camera controller (only for testing will be removed) *******************************/
-        
-        this.controller = new FlyCameraController(this.camera, this.game.input);
-        this.controller.movementSensitivity = 0.005;
-        
+    
+
         /*******************************  Clearing Screen With Color *******************************/
         
         this.gl.clearColor(0.1,0.1,0.1,1);
@@ -207,30 +195,32 @@ export default class MainGame extends Scene {
     {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         
+        
         let VP = this.camera.ViewProjectionMatrix; // Universal View-Projection Matrix (Constant Through The Whole Game)
         
         if(!this.scoremanager.Lose)
         {
             this.time += deltaTime / 1000;             // Time in seconds we use delta time to be consitant on all computers 
         }
-                
-        this.skyBox = new SkyBox(this.gl , this.skyBoxProgram , this.samplerCubeMap , this.meshes['cubeMapMesh'] , this.textures['environment']);
-        this.skyBox.drawSkyBox(this.camera); //Draw The SkyBox
         
+        
+        let lightDir = vec3.fromValues(-0.4,-0.8,0.5);  //Direction of the directional light best values for current scene are vec3(-0.4,-0.8,0.5)
         this.road = new Road(VP , this.roadProgram ,  this.textures['road'] ,this.meshes['road'] , this.gl , deltaTime);
-        
-        this.road.drawRoad(500 , this.camera.position);      // Draws Infinite Plane With X planes to be repeated
+        this.road.drawRoad(500 , this.camera.position , lightDir);      // Draws Infinite Plane With X planes to be repeated
         
         if(!this.scoremanager.Lose)
         {
             this.camera.Move(130 , 0.05 + (this.time/1000) , this.camera, this.ifm);  // Makes camera Move until distance X (calculated from origin) with speed Y
         }
         
-        this.player.Draw(VP,this.camera.getposition(), deltaTime , this.scoremanager.Lose);
+        this.player.Draw(VP,this.camera.getposition(), deltaTime , this.scoremanager.Lose , lightDir);
         
-        this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset);
-        this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset);
-        this.spikes.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset);
+        this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , lightDir);
+        this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , lightDir);
+        this.spikes.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset , lightDir);
+        
+        this.skyBox = new SkyBox(this.gl , this.skyBoxProgram , this.samplerCubeMap , this.meshes['cubeMapMesh'] , this.textures['environment']);
+        this.skyBox.drawSkyBox(this.camera); //Draw The SkyBox
 
         this.ctx.font = "55px Star Jedi";
         this.ctx.fillStyle = "yellow";
