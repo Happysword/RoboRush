@@ -92,7 +92,7 @@ export default class MainGame extends Scene {
         
         this.ifm = new inputFileManager(this.game.loader.resources["inputFile.txt"]);
         this.obstaclesArray = this.ifm.getArray();
-        
+        this.distanceBetweenObstacles = this.ifm.getObstaclesDistance();
         /*******************************  Initializing all the Programs *******************************/
         
         this.textureProgram = new ShaderProgram(this.gl);

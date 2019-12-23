@@ -1,6 +1,7 @@
 export default  class InputFileManager {
     private fileString:string;
     private collisionObjects: number[][];
+    private distanceBetweenObstacles: number;
     public constructor(fs: string)
     {
         this.fileString = fs;
@@ -11,17 +12,26 @@ export default  class InputFileManager {
     {
         let rowsArr  = this.fileString.split("\n");              /*Splits the file string into array of strings. Each string contains a row*/
         let row_counter = 0;
+        this.distanceBetweenObstacles = Number(rowsArr[0]);
+        if(this.distanceBetweenObstacles < 5 || this.distanceBetweenObstacles > 20)
+        {
+            this.distanceBetweenObstacles = 10; //default value
+        }
         rowsArr.forEach( row =>
         {
-            this.collisionObjects[row_counter] = new Array();
-            let col = row.split(" ");                              /*Splits the row string into array of strings. Each string contains a number*/
-            let col_counter = 0;
-            col.forEach( col => 
+            if(row != rowsArr[0])
+            {
+                this.collisionObjects[row_counter] = new Array();
+                let col = row.split(" ");                              /*Splits the row string into array of strings. Each string contains a number*/
+                let col_counter = 0;
+                col.forEach( col => 
             {
                 this.collisionObjects[row_counter][col_counter] = Number(col);
                 col_counter++;
             })
             row_counter++;
+            }
+            
         });
     }
 
@@ -40,6 +50,10 @@ export default  class InputFileManager {
 					array[i] = array[j];
 					array[j] = temp;
 				}
+    }
+    public getObstaclesDistance():number
+    {
+        return this.distanceBetweenObstacles;
     }
     // public getObstaclesType1(): number[]
     // {

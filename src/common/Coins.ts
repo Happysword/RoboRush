@@ -12,9 +12,7 @@ export default class Coins extends Collider {
     CoinsProgram : ShaderProgram;
     CoinsTexture : WebGLTexture;
     CoinsMesh : Mesh;
-    previousHitsLane : number[];
-    previousHitsDistance : number[];
-    previousHitsTime : number[];
+    previousHits: vec3[];
     scoremanager : ScoreManager;
     obstaclesLocations: number[][];
     distanceBetweenObstacles : number;
@@ -24,9 +22,7 @@ export default class Coins extends Collider {
         super(GL);
         this.CoinsProgram = coinsprogram;
         this.CoinsMesh = coinsmesh;
-        this.previousHitsLane = new Array<number>();
-        this.previousHitsDistance = new Array<number>();
-        this.previousHitsTime = new Array<number>();
+        this.previousHits = new Array<vec3>();
         this.scoremanager = scoresManager;
         this.player = playerinst;
         this.CoinsTexture = wrenchTexture;
@@ -60,18 +56,19 @@ export default class Coins extends Collider {
     
     public didCollide(coinLane : number, coinDistance : number, playerPos : number, cameraPos : vec3, time : number) : boolean
     {
+        let thisTime = vec3.create();
+        thisTime[0] = coinLane;
+        thisTime[1] = coinDistance;
+        thisTime[2] = time;
         // First check if object collided with player before
-        // if collided then don't draw for 5 seconds (5=>respawn time)
-        if (this.previousHitsDistance.includes(coinDistance))
+        // if collided then don't draw for 2 seconds (2=>respawn time)
+        for (var i = 0; i < this.previousHits.length; ++i)
         {
-            var index = this.previousHitsDistance.indexOf(coinDistance);
-            if (this.previousHitsLane[index] == coinLane)
+            if ((this.previousHits[i][0] == thisTime[0]) && (this.previousHits[i][1] == thisTime[1]))
             {
-                if ((time - this.previousHitsTime[index]) > 1)
+                if (((thisTime[2] - this.previousHits[i][2]) > 2))
                 {
-                    this.previousHitsDistance.splice(index, 1);
-                    this.previousHitsLane.splice(index, 1);
-                    this.previousHitsTime.splice(index, 1);
+                    this.previousHits.splice(i, 1);
                 }
                 return true;
             }
@@ -85,9 +82,7 @@ export default class Coins extends Collider {
                 // in the right bracket value of collision distance to calculate from infront of user
                 if ((coinDistance >= (cameraPos[2] + 1.5)) && (coinDistance <= (cameraPos[2] + 2.3)))
                 {
-                    this.previousHitsLane.push(coinLane);
-                    this.previousHitsDistance.push(coinDistance);
-                    this.previousHitsTime.push(time);
+                    this.previousHits.push(thisTime);
                     this.scoremanager.ChangeScore(50);
                     return true;
                 }

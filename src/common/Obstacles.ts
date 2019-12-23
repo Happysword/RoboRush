@@ -10,9 +10,7 @@ export default class Obstacles extends Collider {
     ObstaclesProgram : ShaderProgram;
     ObstaclesTexture : WebGLTexture;
     ObstaclesMesh : Mesh;
-    previousHitsLane : number[];
-    previousHitsDistance : number[];
-    previousHitsTime : number[];
+    previousHits: vec3[];
     scoremanager : ScoreManager;
     obstaclesLocations: number[][];
     distanceBetweenObstacles : number;
@@ -23,9 +21,7 @@ export default class Obstacles extends Collider {
         super(GL);
         this.ObstaclesProgram = obstaclesprogram;
         this.ObstaclesMesh = obstaclesmesh;
-        this.previousHitsLane = new Array<number>();
-        this.previousHitsDistance = new Array<number>();
-        this.previousHitsTime = new Array<number>();
+        this.previousHits = new Array<vec3>();
         this.scoremanager = scoresManager;
         this.ObstaclesTexture = barrelTexture;
         this.obstaclesLocations = locations;
@@ -60,16 +56,19 @@ export default class Obstacles extends Collider {
     {
         // First check if object collided with player before
         // if collided then don't draw for 5 seconds (5=>respawn time)
-        if (this.previousHitsDistance.includes(obstacleDistance))
+        let thisTime = vec3.create();
+        thisTime[0] = obstacleLane;
+        thisTime[1] = obstacleDistance;
+        thisTime[2] = time;
+        // First check if object collided with player before
+        // if collided then don't draw for 2 seconds (2=>respawn time)
+        for (var i = 0; i < this.previousHits.length; ++i)
         {
-            var index = this.previousHitsDistance.indexOf(obstacleDistance);
-            if (this.previousHitsLane[index] == obstacleLane)
+            if ((this.previousHits[i][0] == thisTime[0]) && (this.previousHits[i][1] == thisTime[1]))
             {
-                if ((time - this.previousHitsTime[index]) > 1)
+                if (((thisTime[2] - this.previousHits[i][2]) > 2))
                 {
-                    this.previousHitsDistance.splice(index, 1);
-                    this.previousHitsLane.splice(index, 1);
-                    this.previousHitsTime.splice(index, 1);
+                    this.previousHits.splice(i, 1);
                 }
                 return true;
             }
@@ -81,10 +80,7 @@ export default class Obstacles extends Collider {
             // in the right bracket value of collision distance to calculate from infront of user
             if ((obstacleDistance >= (cameraPos[2] + 1)) && (obstacleDistance <= (cameraPos[2] + 3.4)))
             {
-                console.log(obstacleDistance);
-                this.previousHitsLane.push(obstacleLane);
-                this.previousHitsDistance.push(obstacleDistance);
-                this.previousHitsTime.push(time);
+                this.previousHits.push(thisTime);
                 this.scoremanager.LoseGame();
                 return true;
             }
