@@ -43,7 +43,7 @@ export default class Player {
     }
 
 
-    public Draw (VP : mat4 ,camerapos : vec3 , DeltaTime : number , isLost : boolean )
+    public Draw (VP : mat4 ,camerapos : vec3 , DeltaTime : number , isLost : boolean , lightDir : vec3)
     {
         this.time += DeltaTime / 1000; 
 
@@ -85,6 +85,7 @@ export default class Player {
         this.PlayerBodyProgram.setUniformMatrix4fv("VP", false, VP);
         this.PlayerBodyProgram.setUniform3f('cam_position' , camerapos);
         this.PlayerBodyProgram.setUniformMatrix4fv("MVP", false, this.PlayerBodyMat);
+        this.PlayerBodyProgram.setUniform3f('lightDirection' , [lightDir[0],lightDir[1],lightDir[2]]);
         if(!isLost)
         {
             this.PlayerBodyProgram.setUniform4f("tint", [1, 1, 1, 1]);
@@ -115,6 +116,7 @@ export default class Player {
         this.PlayerHeadProgram.setUniformMatrix4fv("VP", false, VP);
         this.PlayerHeadProgram.setUniformMatrix4fv("MVP", false, this.PlayerHeadMat);
         this.PlayerHeadProgram.setUniform3f('cam_position' , camerapos);
+        this.PlayerHeadProgram.setUniform3f('lightDirection' , [lightDir[0],lightDir[1],lightDir[2]]);
         if(!isLost)
         {
             this.PlayerHeadProgram.setUniform4f("tint", [1, 1, 1, 1]);

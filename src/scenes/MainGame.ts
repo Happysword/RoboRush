@@ -54,7 +54,7 @@ export default class MainGame extends Scene {
     // Variables to decide obstacles in scene
     obstaclesOffset : number = 20; // where obstacles start from
     distanceBetweenObstacles : number = 10; // distance between obstacles rows in scene
-    loseCount: number = 0;
+
     static readonly cubemapDirections = ['negx', 'negy', 'negz', 'posx', 'posy', 'posz']
 
     public load(): void {
@@ -225,43 +225,19 @@ export default class MainGame extends Scene {
         {
             this.camera.Move(130 , 0.05 + (this.time/1000) , this.camera, this.ifm);  // Makes camera Move until distance X (calculated from origin) with speed Y
         }
-        else
-        {
-            this.ctx.font = "70px Star Jedi";
-            this.ctx.fillStyle = "yellow";
-            this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-            this.ctx.textAlign = "center";
-            this.ctx.fillText("GAME ovER!", this.ctx.canvas.width/2, this.ctx.canvas.height/2);
-            this.ctx.font = "40px Star Jedi";
-            this.ctx.fillStyle = "yellow";
-            this.ctx.textAlign = "center";
-            this.ctx.fillText("Back to main menu...", this.ctx.canvas.width/2, this.ctx.canvas.height/1.5);
-            
-            this.scoreStaticCounter = 0;
-            this.loseCount++;
-            if(this.loseCount >= 500)
-            {
-                window.location.href = "mainmenu.html";
-            }
-        }
         
         this.player.Draw(VP,this.camera.getposition(), deltaTime , this.scoremanager.Lose);
         
         this.coins.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset);
         this.obstacles.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset);
         this.spikes.Draw(deltaTime, VP, this.player.playerposition, this.camera.getposition(), this.time, this.obstaclesOffset);
-        
-            this.ctx.font = "55px Star Jedi";
-            this.ctx.fillStyle = "yellow";
-            if(!this.scoremanager.Lose)
-        {
-            this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-        }
-            this.ctx.textAlign = "center";
-            this.ctx.fillText("SCoRE " + (this.scoremanager.Score + Math.floor( this.time * 2 )), this.ctx.canvas.width/2, 50);
-            this.scoreStaticCounter = 0;
-        
-        
+
+        this.ctx.font = "55px Star Jedi";
+        this.ctx.fillStyle = "yellow";
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        this.ctx.textAlign = "center";
+        this.ctx.fillText("SCoRE " + (this.scoremanager.Score + Math.floor( this.time * 2 )), this.ctx.canvas.width/2, 50);
+        this.scoreStaticCounter = 0;
 
     }
     
