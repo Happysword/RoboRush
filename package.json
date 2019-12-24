@@ -7,9 +7,6 @@
     "watch": "parcel mainmenu.html",
     "build": "parcel build index.html--no-source-maps --no-content-hash --public-url ."
   },
-  "posthtml-modules": {
-    "root": "./static"
-  },
   "staticFiles": {
     "staticPath": "static",
     "watcherGlob": "**"
