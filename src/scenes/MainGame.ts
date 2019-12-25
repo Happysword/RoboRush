@@ -50,7 +50,7 @@ export default class MainGame extends Scene {
     obstaclesArray: number[][];
     scoreStaticCounter: number = 0;
     // Variables to decide obstacles in scene
-    obstaclesOffset : number = 20; // where obstacles start from
+    obstaclesOffset : number = 28; // where obstacles start from
     distanceBetweenObstacles : number = 10; // distance between obstacles rows in scene
     loseCount: number = 0;
     lightDir:vec3;
