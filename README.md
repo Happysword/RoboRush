@@ -1,7 +1,7 @@
 # RoboRush
 
 <p align="center">
-  <img width="460" height="300" src="https://ibb.co/q9msXJB">
+  <img width="460" height="300" src="https://i.ibb.co/0ZYM8sq/Robo-Rush-Poster.jpg">
 </p>
 
 ## Steps to run
