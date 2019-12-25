@@ -1,6 +1,8 @@
 # RoboRush
 
-![picture alt](https://ibb.co/q9msXJB "RoboRush")
+<p align="center">
+  <img width="460" height="300" src="https://ibb.co/q9msXJB">
+</p>
 
 ## Steps to run
 
