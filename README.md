@@ -1,5 +1,7 @@
 # RoboRush
 
+![picture alt](https://ibb.co/q9msXJB "RoboRush")
+
 ## Steps to run
 
 1. Install [Node.js](https://nodejs.org/en/) and [Visual Studio Code](https://code.visualstudio.com/).
