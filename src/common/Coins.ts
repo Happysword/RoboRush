@@ -70,6 +70,7 @@ export default class Coins extends Collider {
                 if (((thisTime[2] - this.previousHits[i][2]) > 2))
                 {
                     this.previousHits.splice(i, 1);
+                    return false;
                 }
                 return true;
             }
@@ -122,5 +123,10 @@ export default class Coins extends Collider {
             this.CoinsProgram.setUniform4f("tint", [((Math.abs(Math.cos(time*2)*Math.sin(time*2))+0.5)/2)+0.5, 1, ((Math.abs(Math.cos(time*2)*Math.sin(time*2))+0.5)/2)+0.5, 1]);
             this.CoinsMesh.draw(this.gl.TRIANGLES);
         }
+    }
+
+    public clean()
+    {
+        this.previousHits.splice(0, this.previousHits.length);
     }
 }

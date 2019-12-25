@@ -9,4 +9,5 @@ export default abstract class Collider {
 
     public abstract didCollide(ColliderLane : number, ColliderDistance : number, playerPos : number, cameraPos : vec3, time : number): boolean; // Here we will check if the player hit this object or not
     public abstract Draw(deltaTime: number, VP : mat4, playerPos : number, cameraPos : vec3, time : number, offset : number , lightDir : vec3): void; // Here will draw the object
+    public abstract clean() : void;
 }

@@ -72,6 +72,7 @@ export default class Spikes extends Collider {
                 if (((thisTime[2] - this.previousHits[i][2]) > 2))
                 {
                     this.previousHits.splice(i, 1);
+                    return false;
                 }
                 return true;
             }
@@ -122,5 +123,10 @@ export default class Spikes extends Collider {
         this.SpikesProgram.setUniform4f("tint", [1, 1, 1, 1]);
         this.SpikesMesh.draw(this.gl.TRIANGLES);
         
+    }
+
+    public clean()
+    {
+        this.previousHits.splice(0, this.previousHits.length);
     }
 }

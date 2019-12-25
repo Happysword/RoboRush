@@ -70,6 +70,7 @@ export default class Obstacles extends Collider {
                 if (((thisTime[2] - this.previousHits[i][2]) > 2))
                 {
                     this.previousHits.splice(i, 1);
+                    return false;
                 }
                 return true;
             }
@@ -119,5 +120,10 @@ export default class Obstacles extends Collider {
         this.ObstaclesProgram.setUniform4f("tint", [1, 1, 1, 1]);
         this.ObstaclesMesh.draw(this.gl.TRIANGLES);
         
+    }
+
+    public clean()
+    {
+        this.previousHits.splice(0, this.previousHits.length);
     }
 }
